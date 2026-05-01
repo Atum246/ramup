@@ -13,7 +13,7 @@
     :root {
       --bg: #0a0a0a; --bg-card: #111; --bg-terminal: #0d0d0d;
       --green: #00ff88; --green-dim: #00cc6a; --green-glow: rgba(0,255,136,0.12);
-      --white: #f0f0f0; --gray: #888; --gray-dim: #555; --border: #1a1a1a;
+      --white: #f0f0f0; --gray: #888; --gray-dim: #555; --border: #222;
       --font-mono: 'JetBrains Mono','Fira Code',monospace;
       --font-sans: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
     }
@@ -60,12 +60,12 @@
 
     /* ── TERMINAL ── */
     .terminal-wrap { max-width: 640px; width: 100%; margin: 0 auto; }
-    .terminal { background: var(--bg-terminal); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; text-align: left; font-family: var(--font-mono); font-size: clamp(10px, 1.6vw, 13px); line-height: 1.65; }
+    .terminal { background: #111; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; text-align: left; font-family: var(--font-mono); font-size: clamp(10px, 1.6vw, 13px); line-height: 1.65; }
     .terminal-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #111; border-bottom: 1px solid var(--border); }
     .terminal-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
     .terminal-dot.r { background: #ff5f57; } .terminal-dot.y { background: #ffbd2e; } .terminal-dot.g { background: #28ca42; }
-    .terminal-title { margin-left: 6px; font-size: 11px; color: var(--gray-dim); }
-    .terminal-body { padding: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .terminal-title { margin-left: 6px; font-size: 11px; color: var(--gray); }
+    .terminal-body { padding: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; background: #0e0e0e; }
     .terminal-body .prompt { color: var(--green); }
     .terminal-body .cmd { color: var(--white); }
     .terminal-body .output { color: var(--gray); }
@@ -104,10 +104,10 @@
     .vps-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; transition: border-color 0.3s; }
     .vps-card:hover { border-color: var(--green); }
     .vps-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-    .vps-card .vps-type { font-size: 11px; color: var(--gray-dim); font-weight: 400; margin-bottom: 8px; }
+    .vps-card .vps-type { font-size: 11px; color: var(--gray); font-weight: 400; margin-bottom: 8px; }
     .vps-card .price { font-family: var(--font-mono); font-size: 12px; color: var(--green); margin-bottom: 10px; }
     .vps-card .tip { font-size: 12px; color: var(--gray); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); line-height: 1.5; }
-    .vps-card code { display: block; background: #080808; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; font-family: var(--font-mono); font-size: 11px; color: var(--gray); margin-top: 8px; white-space: pre-wrap; word-break: break-all; line-height: 1.5; }
+    .vps-card code { display: block; background: #161616; border: 1px solid #222; border-radius: 6px; padding: 10px 12px; font-family: var(--font-mono); font-size: 11px; color: var(--green); margin-top: 8px; white-space: pre-wrap; word-break: break-all; line-height: 1.5; }
 
     /* Filter tabs */
     .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
@@ -121,7 +121,7 @@
     .cmd-group h3 { font-size: 13px; font-weight: 600; margin-bottom: 14px; }
     .cmd-group code { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--gray); padding: 3px 0; }
     .cmd-group code .name { color: var(--green); }
-    .cmd-group code .desc { color: var(--gray-dim); }
+    .cmd-group code .desc { color: var(--gray); }
 
     /* ── COMPAT ── */
     .compat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
@@ -130,18 +130,18 @@
     .compat-item .icon { font-size: 22px; margin-bottom: 6px; }
 
     /* ── INSTALL ── */
-    .install-box { background: var(--bg-terminal); border: 1px solid var(--border); border-radius: 12px; padding: 28px 20px; text-align: center; margin-top: 32px; }
+    .install-box { background: #111; border: 1px solid #222; border-radius: 12px; padding: 28px 20px; text-align: center; margin-top: 32px; }
     .install-box h3 { font-size: 18px; margin-bottom: 16px; }
-    .install-cmd { font-family: var(--font-mono); font-size: clamp(12px, 2vw, 15px); background: #0a0a0a; border: 1px solid var(--border); border-radius: 8px; padding: 14px 20px; color: var(--green); display: inline-block; margin-bottom: 16px; user-select: all; cursor: pointer; transition: border-color 0.2s; word-break: break-all; max-width: 100%; }
+    .install-cmd { font-family: var(--font-mono); font-size: clamp(12px, 2vw, 15px); background: #161616; border: 1px solid #222; border-radius: 8px; padding: 14px 20px; color: var(--green); display: inline-block; margin-bottom: 16px; user-select: all; cursor: pointer; transition: border-color 0.2s; word-break: break-all; max-width: 100%; }
     .install-cmd:hover { border-color: var(--green); }
-    .install-note { font-size: 12px; color: var(--gray-dim); }
+    .install-note { font-size: 12px; color: var(--gray); }
 
     /* ── FOOTER ── */
     footer { border-top: 1px solid var(--border); padding: 36px 20px; text-align: center; }
-    footer p { font-size: 12px; color: var(--gray-dim); line-height: 2; }
+    footer p { font-size: 12px; color: var(--gray); line-height: 2; }
     footer a { color: var(--gray); text-decoration: none; transition: color 0.2s; }
     footer a:hover { color: var(--green); }
-    .divider { max-width: 1100px; margin: 0 auto; border: none; border-top: 1px solid var(--border); }
+    .divider { max-width: 1100px; margin: 0 auto; border: none; border-top: 1px solid #222; }
 
     /* ── ANIMATION ── */
     .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
