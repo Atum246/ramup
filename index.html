@@ -13,7 +13,7 @@
     :root {
       --bg: #0a0a0a; --bg-card: #111; --bg-terminal: #0d0d0d;
       --green: #00ff88; --green-dim: #00cc6a; --green-glow: rgba(0,255,136,0.12);
-      --white: #f0f0f0; --gray: #888; --gray-dim: #555; --border: #222;
+      --white: #f0f0f0; --gray: #999; --gray-dim: #666; --border: #282828;
       --font-mono: 'JetBrains Mono','Fira Code',monospace;
       --font-sans: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
     }
@@ -84,7 +84,7 @@
 
     /* ── ENGINES ── */
     .engines { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
-    .engine { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; transition: border-color 0.3s; }
+    .engine { background: var(--bg-card); border: 1px solid #282828; border-radius: 12px; padding: 24px; transition: border-color 0.3s; }
     .engine:hover { border-color: var(--gray-dim); }
     .engine-icon { font-size: 26px; margin-bottom: 14px; }
     .engine h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
@@ -92,7 +92,7 @@
     .engine-stat { font-family: var(--font-mono); font-size: 12px; color: var(--green); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
 
     /* ── TABLE ── */
-    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 28px; border-radius: 12px; border: 1px solid var(--border); }
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 28px; border-radius: 12px; border: 1px solid #282828; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 500px; }
     th { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); background: var(--bg-card); position: sticky; top: 0; }
     td { padding: 12px 14px; border-bottom: 1px solid #111; color: var(--gray); }
@@ -101,13 +101,13 @@
 
     /* ── VPS CARDS ── */
     .vps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
-    .vps-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; transition: border-color 0.3s; }
+    .vps-card { background: var(--bg-card); border: 1px solid #282828; border-radius: 12px; padding: 22px; transition: border-color 0.3s; }
     .vps-card:hover { border-color: var(--green); }
     .vps-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
     .vps-card .vps-type { font-size: 11px; color: var(--gray); font-weight: 400; margin-bottom: 8px; }
     .vps-card .price { font-family: var(--font-mono); font-size: 12px; color: var(--green); margin-bottom: 10px; }
     .vps-card .tip { font-size: 12px; color: var(--gray); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); line-height: 1.5; }
-    .vps-card code { display: block; background: #161616; border: 1px solid #222; border-radius: 6px; padding: 10px 12px; font-family: var(--font-mono); font-size: 11px; color: var(--green); margin-top: 8px; white-space: pre-wrap; word-break: break-all; line-height: 1.5; }
+    .vps-card code { display: block; background: #161616; border: 1px solid #282828; border-radius: 6px; padding: 10px 12px; font-family: var(--font-mono); font-size: 11px; color: var(--green); margin-top: 8px; white-space: pre-wrap; word-break: break-all; line-height: 1.5; }
 
     /* Filter tabs */
     .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
@@ -117,7 +117,7 @@
 
     /* ── COMMANDS ── */
     .cmd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
-    .cmd-group { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .cmd-group { background: var(--bg-card); border: 1px solid #282828; border-radius: 12px; padding: 20px; }
     .cmd-group h3 { font-size: 13px; font-weight: 600; margin-bottom: 14px; }
     .cmd-group code { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--gray); padding: 3px 0; }
     .cmd-group code .name { color: var(--green); }
@@ -125,14 +125,14 @@
 
     /* ── COMPAT ── */
     .compat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-    .compat-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 14px; text-align: center; font-size: 13px; font-weight: 500; transition: border-color 0.3s; }
+    .compat-item { background: var(--bg-card); border: 1px solid #282828; border-radius: 10px; padding: 18px 14px; text-align: center; font-size: 13px; font-weight: 500; transition: border-color 0.3s; }
     .compat-item:hover { border-color: var(--green); }
     .compat-item .icon { font-size: 22px; margin-bottom: 6px; }
 
     /* ── INSTALL ── */
-    .install-box { background: #111; border: 1px solid #222; border-radius: 12px; padding: 28px 20px; text-align: center; margin-top: 32px; }
+    .install-box { background: #111; border: 1px solid #282828; border-radius: 12px; padding: 28px 20px; text-align: center; margin-top: 32px; }
     .install-box h3 { font-size: 18px; margin-bottom: 16px; }
-    .install-cmd { font-family: var(--font-mono); font-size: clamp(12px, 2vw, 15px); background: #161616; border: 1px solid #222; border-radius: 8px; padding: 14px 20px; color: var(--green); display: inline-block; margin-bottom: 16px; user-select: all; cursor: pointer; transition: border-color 0.2s; word-break: break-all; max-width: 100%; }
+    .install-cmd { font-family: var(--font-mono); font-size: clamp(12px, 2vw, 15px); background: #161616; border: 1px solid #282828; border-radius: 8px; padding: 14px 20px; color: var(--green); display: inline-block; margin-bottom: 16px; user-select: all; cursor: pointer; transition: border-color 0.2s; word-break: break-all; max-width: 100%; }
     .install-cmd:hover { border-color: var(--green); }
     .install-note { font-size: 12px; color: var(--gray); }
 
@@ -146,6 +146,11 @@
     /* ── ANIMATION ── */
     .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
     .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* Mobile: disable animations, show everything immediately */
+    @media (max-width: 768px) {
+      .fade-in { opacity: 1; transform: none; transition: none; }
+    }
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
