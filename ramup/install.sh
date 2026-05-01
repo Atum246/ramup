@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# ═══════════════════════════════════════════════════════════
-# 🟢 RAMUP Installer
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════════════
+# 🟢 RAMUP Installer v2.0
+# "More RAM. Zero Cost. No Bullshit."
+# ═══════════════════════════════════════════════════════════════════════════════
 # Usage: curl -sL ramup.io/install | bash
-# Or:    bash install.sh
-# ═══════════════════════════════════════════════════════════
+# Or:    sudo bash install.sh
+# ═══════════════════════════════════════════════════════════════════════════════
 
-set -euo pipefail
+set -uo pipefail
 
-# ─── Colors ───────────────────────────────────────────────
+# ─── Colors ───────────────────────────────────────────────────────────────────
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -19,72 +20,131 @@ BOLD='\033[1m'
 NC='\033[0m'
 
 RAMUP_DIR="/opt/ramup"
-RAMUP_VERSION="1.0.0"
-RAMUP_REPO="https://github.com/ramup/ramup"  # Update with actual repo
+RAMUP_VERSION="2.0.0"
 
-# ─── Banner ───────────────────────────────────────────────
+# ─── Logo ─────────────────────────────────────────────────────────────────────
 echo -e "${GREEN}${BOLD}"
-cat << 'EOF'
-    ╔═══════════════════════════════════════╗
-    ║         🟢  R A M U P  🟢           ║
-    ║                                       ║
-    ║    "Your 4GB just became 7GB"        ║
-    ║                                       ║
-    ╚═══════════════════════════════════════╝
-EOF
+cat << 'LOGO'
+
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║                                                               ║
+    ║     ██████╗  █████╗ ███╗   ███╗██╗   ██╗██████╗              ║
+    ║     ██╔══██╗██╔══██╗████╗ ████║██║   ██║██╔══██╗             ║
+    ║     ██████╔╝███████║██╔████╔██║██║   ██║██████╔╝             ║
+    ║     ██╔══██╗██╔══██║██║╚██╔╝██║██║   ██║██╔═══╝              ║
+    ║     ██║  ██║██║  ██║██║ ╚═╝ ██║╚██████╔╝██║                  ║
+    ║     ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝ ╚═════╝ ╚═╝                  ║
+    ║                                                               ║
+    ║          "More RAM. Zero Cost. No Bullshit."                 ║
+    ║                                                               ║
+    ╚═══════════════════════════════════════════════════════════════╝
+
+LOGO
 echo -e "${NC}"
 
-echo -e "${DIM}Advanced VPS memory extension tool v${RAMUP_VERSION}${NC}"
-echo -e "${DIM}Safe. Simple. Powerful.${NC}"
+echo -e "${DIM}Advanced VPS Memory Extension Engine v${RAMUP_VERSION}${NC}"
+echo -e "${DIM}Works with ANY RAM size. Any distro. Any VPS.${NC}"
 echo ""
 
-# ─── Root Check ───────────────────────────────────────────
+# ─── Root Check ───────────────────────────────────────────────────────────────
 if [[ $EUID -ne 0 ]]; then
     echo -e "${RED}[✗] This installer requires root privileges${NC}"
     echo -e "${YELLOW}Try: sudo bash install.sh${NC}"
     exit 1
 fi
 
-# ─── OS Detection ─────────────────────────────────────────
+# ─── System Detection ─────────────────────────────────────────────────────────
 echo -e "${CYAN}[·]${NC} Detecting system..."
 
 if [[ -f /etc/os-release ]]; then
     source /etc/os-release
     OS_ID="${ID:-unknown}"
     OS_VERSION="${VERSION_ID:-0}"
+    OS_NAME="${PRETTY_NAME:-${OS_ID} ${OS_VERSION}}"
 else
     OS_ID="unknown"
     OS_VERSION="0"
+    OS_NAME="Unknown Linux"
 fi
 
 KERNEL=$(uname -r)
 RAM_MB=$(awk '/MemTotal/ {printf "%.0f", $2/1024}' /proc/meminfo)
 CORES=$(nproc 2>/dev/null || grep -c ^processor /proc/cpuinfo)
+ARCH=$(uname -m)
+VIRT=$(systemd-detect-virt 2>/dev/null || echo "unknown")
 
-echo -e "${GREEN}[✓]${NC} System: ${OS_ID} ${OS_VERSION} | Kernel: ${KERNEL}"
-echo -e "${GREEN}[✓]${NC} RAM: ${RAM_MB}MB | CPU Cores: ${CORES}"
+# Smart sizing info
+if [[ "$RAM_MB" -le 512 ]]; then
+    RAM_TIER="ultra-low"
+    ZRAM_EXPECTED=$((RAM_MB * 150 / 100))
+    SWAP_EXPECTED=$((RAM_MB * 3))
+elif [[ "$RAM_MB" -le 1024 ]]; then
+    RAM_TIER="low"
+    ZRAM_EXPECTED=$((RAM_MB * 125 / 100))
+    SWAP_EXPECTED=$((RAM_MB * 2))
+elif [[ "$RAM_MB" -le 2048 ]]; then
+    RAM_TIER="moderate"
+    ZRAM_EXPECTED=$RAM_MB
+    SWAP_EXPECTED=$((RAM_MB * 3 / 2))
+elif [[ "$RAM_MB" -le 4096 ]]; then
+    RAM_TIER="standard"
+    ZRAM_EXPECTED=$((RAM_MB * 3 / 4))
+    SWAP_EXPECTED=$RAM_MB
+elif [[ "$RAM_MB" -le 8192 ]]; then
+    RAM_TIER="good"
+    ZRAM_EXPECTED=$((RAM_MB / 2))
+    SWAP_EXPECTED=$((RAM_MB * 3 / 4))
+elif [[ "$RAM_MB" -le 16384 ]]; then
+    RAM_TIER="high"
+    ZRAM_EXPECTED=$((RAM_MB * 35 / 100))
+    SWAP_EXPECTED=$((RAM_MB / 2))
+elif [[ "$RAM_MB" -le 32768 ]]; then
+    RAM_TIER="very-high"
+    ZRAM_EXPECTED=$((RAM_MB / 4))
+    SWAP_EXPECTED=$((RAM_MB * 35 / 100))
+else
+    RAM_TIER="enterprise"
+    ZRAM_EXPECTED=$((RAM_MB * 15 / 100))
+    SWAP_EXPECTED=$((RAM_MB / 4))
+fi
 
-# ─── Pre-flight Checks ───────────────────────────────────
+[[ "$SWAP_EXPECTED" -gt 32768 ]] && SWAP_EXPECTED=32768
+[[ "$ZRAM_EXPECTED" -lt 256 ]] && ZRAM_EXPECTED=256
+
+EFFECTIVE=$((RAM_MB + ZRAM_EXPECTED + SWAP_EXPECTED))
+
+echo -e "${GREEN}[✓]${NC} System: ${OS_NAME}"
+echo -e "${GREEN}[✓]${NC} Kernel: ${KERNEL} | Arch: ${ARCH} | Virt: ${VIRT}"
+echo -e "${GREEN}[✓]${NC} RAM: ${RAM_MB}MB (${RAM_TIER}) | CPU: ${CORES} cores"
 echo ""
+
+echo -e "${CYAN}${BOLD}  Expected improvement:${NC}"
+echo -e "  ${DIM}├─${NC} Physical RAM:   ${WHITE}${RAM_MB}MB${NC}"
+echo -e "  ${DIM}├─${NC} ZRAM addition:  ${GREEN}+${ZRAM_EXPECTED}MB${NC}"
+echo -e "  ${DIM}├─${NC} Swap addition:  ${GREEN}+${SWAP_EXPECTED}MB${NC}"
+echo -e "  ${DIM}└─${NC} Effective RAM:  ${GREEN}${BOLD}~${EFFECTIVE}MB${NC} 🚀"
+echo ""
+
+# ─── Pre-flight Checks ───────────────────────────────────────────────────────
 echo -e "${CYAN}[·]${NC} Running pre-flight checks..."
 
-# Check kernel version (need 3.14+ for ZRAM)
+# Kernel version check (need 3.14+ for ZRAM)
 KERNEL_MAJOR=$(echo "$KERNEL" | cut -d. -f1)
 KERNEL_MINOR=$(echo "$KERNEL" | cut -d. -f2)
 if [[ "$KERNEL_MAJOR" -lt 3 ]] || [[ "$KERNEL_MAJOR" -eq 3 && "$KERNEL_MINOR" -lt 14 ]]; then
     echo -e "${RED}[✗] Kernel ${KERNEL} is too old. Need 3.14+ for ZRAM.${NC}"
     exit 1
 fi
-echo -e "${GREEN}[✓]${NC} Kernel version OK (${KERNEL})"
+echo -e "${GREEN}[✓]${NC} Kernel version OK"
 
-# Check for ZRAM support
+# ZRAM support
 if [[ -d /sys/class/block/zram0 ]] || modprobe zram 2>/dev/null; then
     echo -e "${GREEN}[✓]${NC} ZRAM supported"
 else
     echo -e "${YELLOW}[!]${NC} ZRAM may not be available (will try anyway)"
 fi
 
-# Check disk space
+# Disk space
 DISK_FREE=$(df -m / | awk 'NR==2 {print $4}')
 if [[ "$DISK_FREE" -lt 512 ]]; then
     echo -e "${RED}[✗] Not enough disk space (${DISK_FREE}MB free, need 512MB+)${NC}"
@@ -92,22 +152,16 @@ if [[ "$DISK_FREE" -lt 512 ]]; then
 fi
 echo -e "${GREEN}[✓]${NC} Disk space OK (${DISK_FREE}MB free)"
 
-# ─── Backup Existing Installation ─────────────────────────
+# Check for existing installation
 if [[ -d "$RAMUP_DIR" ]]; then
-    echo ""
-    echo -e "${YELLOW}[!]${NC} Existing ramup installation found"
-    echo -e "${DIM}Creating backup before reinstall...${NC}"
-    
+    echo -e "${YELLOW}[!]${NC} Existing ramup installation found — will upgrade"
     BACKUP_DIR="${RAMUP_DIR}.bak.$(date +%Y%m%d_%H%M%S)"
     cp -a "$RAMUP_DIR" "$BACKUP_DIR" 2>/dev/null || true
-    echo -e "${GREEN}[✓]${NC} Backup created: ${BACKUP_DIR}"
-    
-    # Stop existing services
     systemctl stop ramup-adjust.service 2>/dev/null || true
     systemctl disable ramup-adjust.service 2>/dev/null || true
 fi
 
-# ─── Install Dependencies ─────────────────────────────────
+# ─── Install Dependencies ─────────────────────────────────────────────────────
 echo ""
 echo -e "${CYAN}[·]${NC} Checking dependencies..."
 
@@ -129,101 +183,87 @@ install_pkg() {
         pacman -S --noconfirm "$pkg" >/dev/null 2>&1
     elif command -v apk &>/dev/null; then
         apk add "$pkg" >/dev/null 2>&1
-    else
-        echo -e "${YELLOW}[!]${NC} Cannot install ${pkg} - unknown package manager"
-        return 1
     fi
 }
 
-# Required tools
 for cmd in bc awk sed grep; do
     if command -v "$cmd" &>/dev/null; then
-        echo -e "${GREEN}[✓]${NC} ${cmd} available"
+        echo -e "${GREEN}[✓]${NC} ${cmd}"
     else
-        echo -e "${YELLOW}[!]${NC} ${cmd} not found (installing...)"
         install_pkg "$cmd" || true
     fi
 done
 
-# Optional but recommended
 for cmd in zstd lz4; do
     if command -v "$cmd" &>/dev/null; then
-        echo -e "${GREEN}[✓]${NC} ${cmd} available"
+        echo -e "${GREEN}[✓]${NC} ${cmd} (compression)"
     else
         install_pkg "$cmd" 2>/dev/null || true
     fi
 done
 
-# ─── Install ramup ────────────────────────────────────────
+# ─── Install ramup ────────────────────────────────────────────────────────────
 echo ""
 echo -e "${CYAN}[·]${NC} Installing ramup to ${RAMUP_DIR}..."
 
-# Create directory structure
-mkdir -p "${RAMUP_DIR}"/{lib,logs,backups}
+mkdir -p "${RAMUP_DIR}"/{lib,logs,backups,cache}
 
-# Copy files
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ -f "${SCRIPT_DIR}/ramup" ]]; then
-    # Local install
     cp "${SCRIPT_DIR}/ramup" "${RAMUP_DIR}/ramup"
-    cp "${SCRIPT_DIR}"/lib/*.sh "${RAMUP_DIR}/lib/"
+    cp "${SCRIPT_DIR}"/lib/*.sh "${RAMUP_DIR}/lib/" 2>/dev/null || true
 else
-    # Download from repo (placeholder — update with actual URL)
     echo -e "${RED}[✗]${NC} Cannot find ramup files"
     echo -e "${DIM}Please run this script from the ramup directory${NC}"
     exit 1
 fi
 
-# Make executable
 chmod +x "${RAMUP_DIR}/ramup"
-
-# Create symlink in PATH
 ln -sfn "${RAMUP_DIR}/ramup" /usr/local/bin/ramup
 
 echo -e "${GREEN}[✓]${NC} Files installed"
 
-# ─── Initialize Config ────────────────────────────────────
-echo -e "${CYAN}[·]${NC} Initializing configuration..."
-
+# ─── Initialize ───────────────────────────────────────────────────────────────
 cat > "${RAMUP_DIR}/config.conf" << EOF
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════
 # 🟢 RAMUP Configuration
 # Generated: $(date -Iseconds)
 # System: ${RAM_MB}MB RAM, ${CORES} cores, ${OS_ID} ${OS_VERSION}
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════
 
-# General
 RAMUP_VERSION=${RAMUP_VERSION}
 RAMUP_DIR=${RAMUP_DIR}
-
-# Will be populated by ramup install
+SYSTEM_RAM_MB=${RAM_MB}
+SYSTEM_CORES=${CORES}
+SYSTEM_DISTRO=${OS_ID}
+RAM_TIER=${RAM_TIER}
 EOF
 
 echo -e "${GREEN}[✓]${NC} Configuration initialized"
 
-# ─── Run Installation ─────────────────────────────────────
+# ─── Run Installation ─────────────────────────────────────────────────────────
 echo ""
 echo -e "${CYAN}[·]${NC} Running ramup install..."
 echo ""
 
-# Run the actual install
 "${RAMUP_DIR}/ramup" install --force
 
-# ─── Done ─────────────────────────────────────────────────
+# ─── Done ─────────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}${BOLD}"
-echo "  ════════════════════════════════════════════════════"
-echo "            🎉 Installation Complete! 🎉             "
-echo "  ════════════════════════════════════════════════════"
+echo "  ════════════════════════════════════════════════════════════════"
+echo "                    🎉 Installation Complete! 🎉                "
+echo "  ════════════════════════════════════════════════════════════════"
 echo -e "${NC}"
 echo ""
-echo -e "  ${WHITE}Commands:${NC}"
-echo -e "    ${CYAN}ramup status${NC}    — Check memory status"
-echo -e "    ${CYAN}ramup monitor${NC}   — Live dashboard"
-echo -e "    ${CYAN}ramup health${NC}    — System health check"
-echo -e "    ${CYAN}ramup off${NC}       — Disable safely"
-echo -e "    ${CYAN}ramup help${NC}      — All commands"
+echo -e "  ${WHITE}Quick Start:${NC}"
+echo -e "    ${CYAN}ramup status${NC}      Memory status card"
+echo -e "    ${CYAN}ramup monitor${NC}     Live dashboard"
+echo -e "    ${CYAN}ramup health${NC}      Health check"
+echo -e "    ${CYAN}ramup tune${NC}        Auto-tune for workload"
+echo -e "    ${CYAN}ramup boost${NC}       Instant memory boost"
+echo -e "    ${CYAN}ramup help${NC}        All commands"
 echo ""
 echo -e "  ${DIM}Your VPS memory has been extended! 🚀${NC}"
 echo ""

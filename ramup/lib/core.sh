@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# ═══════════════════════════════════════════════════════════
-# ramup/lib/core.sh — Core system detection & utilities
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════════════
+# ramup/lib/core.sh — Core System Detection & Utilities
+# Works with ANY RAM size. Any distro. Any VPS.
+# ═══════════════════════════════════════════════════════════════════════════════
 
-# ─── System Detection ─────────────────────────────────────
+# ─── System Detection ─────────────────────────────────────────────────────────
 TOTAL_RAM_MB=0
 CPU_CORES=0
 DISTRO=""
@@ -13,6 +14,7 @@ HAS_SSD=0
 HAS_ZRAM_SUPPORT=0
 HAS_ZSTD=0
 HAS_LZ4=0
+VIRT_TYPE=""
 
 detect_system() {
     # RAM
@@ -23,15 +25,22 @@ detect_system() {
     
     # Distro
     if [[ -f /etc/os-release ]]; then
-        source /etc/os-release
-        DISTRO="${ID:-unknown}"
-        DISTRO_VERSION="${VERSION_ID:-0}"
+        local os_id os_version os_name
+        os_id=$(grep "^ID=" /etc/os-release | cut -d= -f2 | tr -d '"')
+        os_version=$(grep "^VERSION_ID=" /etc/os-release | cut -d= -f2 | tr -d '"')
+        os_name=$(grep "^PRETTY_NAME=" /etc/os-release | cut -d= -f2 | tr -d '"')
+        DISTRO="${os_id:-unknown}"
+        DISTRO_VERSION="${os_version:-0}"
+        DISTRO_NAME="${os_name:-${DISTRO} ${DISTRO_VERSION}}"
     fi
     
     # Kernel
     KERNEL_VERSION=$(uname -r)
     
-    # SSD detection
+    # Virtualization
+    VIRT_TYPE=$(systemd-detect-virt 2>/dev/null || echo "unknown")
+    
+    # Storage
     detect_storage_type
     
     # ZRAM support
@@ -40,32 +49,32 @@ detect_system() {
     fi
     
     # Compression algorithms
-    [[ -f /sys/block/zram0/comp_algorithm ]] && HAS_ZSTD=1
+    if [[ -f /sys/block/zram0/comp_algorithm ]]; then
+        HAS_ZSTD=1
+        HAS_LZ4=1
+    fi
     command -v zstd &>/dev/null && HAS_ZSTD=1
     command -v lz4 &>/dev/null && HAS_LZ4=1
     
-    # Check kernel config for zram
+    # Check kernel config
     local kconfig="/boot/config-${KERNEL_VERSION}"
     if [[ -f "$kconfig" ]]; then
         if grep -q "CONFIG_ZRAM=m\|CONFIG_ZRAM=y" "$kconfig" 2>/dev/null; then
             HAS_ZRAM_SUPPORT=1
         fi
     fi
-    
-    # Also check /proc/config.gz
     if [[ -f /proc/config.gz ]]; then
         if zcat /proc/config.gz 2>/dev/null | grep -q "CONFIG_ZRAM=m\|CONFIG_ZRAM=y"; then
             HAS_ZRAM_SUPPORT=1
         fi
     fi
     
-    log DEBUG "System: ${DISTRO} ${DISTRO_VERSION}, ${TOTAL_RAM_MB}MB RAM, ${CPU_CORES} cores, Kernel ${KERNEL_VERSION}"
+    log DEBUG "System: ${DISTRO} ${DISTRO_VERSION}, ${TOTAL_RAM_MB}MB RAM, ${CPU_CORES} cores, Kernel ${KERNEL_VERSION}, Virt: ${VIRT_TYPE}"
 }
 
 detect_storage_type() {
     HAS_SSD=0
     
-    # Check if root filesystem is on SSD
     local root_device
     root_device=$(findmnt -n -o SOURCE / 2>/dev/null | sed 's/[0-9]*$//' | sed 's|^/dev/||')
     
@@ -80,7 +89,6 @@ detect_storage_type() {
         fi
     fi
     
-    # NVMe check
     if lsblk -d -o ROTA 2>/dev/null | grep -q "0"; then
         HAS_SSD=1
     fi
@@ -88,7 +96,7 @@ detect_storage_type() {
     log DEBUG "Storage: SSD=${HAS_SSD}"
 }
 
-# ─── Memory Utilities ─────────────────────────────────────
+# ─── Memory Utilities ─────────────────────────────────────────────────────────
 get_total_ram_mb() {
     echo "$TOTAL_RAM_MB"
 }
@@ -119,6 +127,17 @@ get_swap_used_mb() {
     echo $((total - free))
 }
 
+get_swap_size_mb() {
+    local total=0
+    if [[ -f "/swapfile.ramup" ]]; then
+        total=$(du -m /swapfile.ramup 2>/dev/null | awk '{print $1}' || echo "0")
+    fi
+    if [[ "$total" -eq 0 ]]; then
+        total=$(get_swap_total_mb)
+    fi
+    echo "$total"
+}
+
 get_zram_size_mb() {
     local total=0
     for zram_dev in /sys/block/zram*; do
@@ -135,9 +154,8 @@ get_zram_used_mb() {
     local total=0
     for zram_dev in /sys/block/zram*; do
         if [[ -d "$zram_dev" ]]; then
-            local orig_data compr_data
+            local orig_data
             orig_data=$(cat "${zram_dev}/mm_stat" 2>/dev/null | awk '{print $1}' || echo "0")
-            compr_data=$(cat "${zram_dev}/mm_stat" 2>/dev/null | awk '{print $2}' || echo "0")
             if [[ "$orig_data" -gt 0 ]]; then
                 total=$((total + orig_data / 1024 / 1024))
             fi
@@ -167,13 +185,17 @@ get_compression_ratio() {
     fi
 }
 
-# ─── Swap Size Calculator ─────────────────────────────────
+# ─── Smart Sizing — Works with ANY RAM ────────────────────────────────────────
 calculate_optimal_swap() {
     local ram_mb=$1
     local swap_mb=0
     
-    if [[ "$ram_mb" -le 1024 ]]; then
-        # <= 1GB: 2x RAM
+    # Smart scaling based on RAM size
+    if [[ "$ram_mb" -le 512 ]]; then
+        # Ultra-low RAM (512MB or less): 3x RAM
+        swap_mb=$((ram_mb * 3))
+    elif [[ "$ram_mb" -le 1024 ]]; then
+        # Low RAM (512MB-1GB): 2x RAM
         swap_mb=$((ram_mb * 2))
     elif [[ "$ram_mb" -le 2048 ]]; then
         # 1-2GB: 1.5x RAM
@@ -184,44 +206,69 @@ calculate_optimal_swap() {
     elif [[ "$ram_mb" -le 8192 ]]; then
         # 4-8GB: 0.75x RAM
         swap_mb=$((ram_mb * 3 / 4))
-    else
-        # 8GB+: 0.5x RAM
+    elif [[ "$ram_mb" -le 16384 ]]; then
+        # 8-16GB: 0.5x RAM
         swap_mb=$((ram_mb / 2))
+    elif [[ "$ram_mb" -le 32768 ]]; then
+        # 16-32GB: 0.35x RAM
+        swap_mb=$((ram_mb * 35 / 100))
+    elif [[ "$ram_mb" -le 65536 ]]; then
+        # 32-64GB: 0.25x RAM
+        swap_mb=$((ram_mb / 4))
+    else
+        # 64GB+: 0.15x RAM (capped at 32GB)
+        swap_mb=$((ram_mb * 15 / 100))
     fi
     
-    # Cap at 8GB
-    [[ "$swap_mb" -gt 8192 ]] && swap_mb=8192
+    # Cap at 32GB
+    [[ "$swap_mb" -gt 32768 ]] && swap_mb=32768
+    
+    # Minimum 256MB
+    [[ "$swap_mb" -lt 256 ]] && swap_mb=256
     
     echo "$swap_mb"
 }
 
-# ─── ZRAM Size Calculator ─────────────────────────────────
 calculate_optimal_zram() {
     local ram_mb=$1
     local cores=$2
     local zram_mb=0
     
-    # Use 50-100% of RAM depending on total RAM
-    if [[ "$ram_mb" -le 2048 ]]; then
-        # Low RAM: use 100% for ZRAM
+    # Smart scaling based on RAM size
+    if [[ "$ram_mb" -le 512 ]]; then
+        # Ultra-low: 150% of RAM (aggressive)
+        zram_mb=$((ram_mb * 150 / 100))
+    elif [[ "$ram_mb" -le 1024 ]]; then
+        # Low: 125% of RAM
+        zram_mb=$((ram_mb * 125 / 100))
+    elif [[ "$ram_mb" -le 2048 ]]; then
+        # 1-2GB: 100% of RAM
         zram_mb=$ram_mb
     elif [[ "$ram_mb" -le 4096 ]]; then
-        # 2-4GB: use 75%
+        # 2-4GB: 75% of RAM
         zram_mb=$((ram_mb * 3 / 4))
     elif [[ "$ram_mb" -le 8192 ]]; then
-        # 4-8GB: use 50%
+        # 4-8GB: 50% of RAM
         zram_mb=$((ram_mb / 2))
-    else
-        # 8GB+: use 25%
+    elif [[ "$ram_mb" -le 16384 ]]; then
+        # 8-16GB: 35% of RAM
+        zram_mb=$((ram_mb * 35 / 100))
+    elif [[ "$ram_mb" -le 32768 ]]; then
+        # 16-32GB: 25% of RAM
         zram_mb=$((ram_mb / 4))
+    else
+        # 32GB+: 15% of RAM
+        zram_mb=$((ram_mb * 15 / 100))
     fi
+    
+    # Minimum 256MB for ZRAM
+    [[ "$zram_mb" -lt 256 ]] && zram_mb=256
     
     echo "$zram_mb"
 }
 
-# ─── Best Compression Algorithm ───────────────────────────
+# ─── Best Compression Algorithm ───────────────────────────────────────────────
 get_best_algorithm() {
-    # Preference: zstd > lz4 > lzo-rle > lzo
     local available
     available=$(cat /sys/block/zram0/comp_algorithm 2>/dev/null || echo "")
     
@@ -230,6 +277,7 @@ get_best_algorithm() {
         return
     fi
     
+    # Preference: zstd (best ratio) > lz4 (fastest) > lzo-rle > lzo
     if echo "$available" | grep -q "zstd"; then
         echo "zstd"
     elif echo "$available" | grep -q "lz4"; then
@@ -241,24 +289,31 @@ get_best_algorithm() {
     fi
 }
 
-# ─── Filesystem Type ──────────────────────────────────────
+# ─── Filesystem Type ──────────────────────────────────────────────────────────
 get_root_fs_type() {
     findmnt -n -o FSTYPE / 2>/dev/null || echo "ext4"
 }
 
-# ─── Check if running in container ────────────────────────
+# ─── Check Environment ────────────────────────────────────────────────────────
 is_container() {
     [[ -f /.dockerenv ]] || [[ -f /run/.containerenv ]] || grep -q "docker\|lxc\|container" /proc/1/cgroup 2>/dev/null
 }
 
-# ─── Check if VPS ─────────────────────────────────────────
 is_vps() {
     local virt
     virt=$(systemd-detect-virt 2>/dev/null || echo "none")
     [[ "$virt" != "none" && "$virt" != "physical" ]]
 }
 
-# ─── Confirm Prompt ───────────────────────────────────────
+is_low_memory() {
+    [[ "$TOTAL_RAM_MB" -lt 2048 ]]
+}
+
+is_ultra_low_memory() {
+    [[ "$TOTAL_RAM_MB" -lt 1024 ]]
+}
+
+# ─── Confirm Prompt ───────────────────────────────────────────────────────────
 confirm() {
     local msg="${1:-Are you sure?}"
     
@@ -269,4 +324,19 @@ confirm() {
     echo -en "${YELLOW}${msg} [y/N]${NC} "
     read -r response
     [[ "$response" =~ ^[Yy] ]]
+}
+
+# ─── Human Readable Sizes ─────────────────────────────────────────────────────
+human_readable() {
+    local mb=$1
+    if [[ "$mb" -ge 1024 ]]; then
+        echo "$(echo "scale=1; ${mb} / 1024" | bc 2>/dev/null || echo "${mb}")GB"
+    else
+        echo "${mb}MB"
+    fi
+}
+
+# ─── Timestamp ────────────────────────────────────────────────────────────────
+now() {
+    date '+%Y-%m-%d %H:%M:%S'
 }
