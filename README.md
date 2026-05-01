@@ -1,6 +1,6 @@
 <p align="center">
   <br>
-  <img src="https://raw.githubusercontent.com/Atum246/ramup/master/docs/ramup-logo.png" alt="RAMUP" width="400">
+  <img src="https://raw.githubusercontent.com/Atum246/ramup/master/docs/ramup-logo.svg" alt="RAMUP" width="400">
   <br>
   <br>
 </p>
@@ -18,7 +18,8 @@
 </p>
 
 <p align="center">
-  Advanced VPS Memory Extension Engine — Works with ANY RAM size. Any distro. Any VPS.
+  Advanced VPS Memory Extension Engine — Works with ANY RAM size. Any distro. Any VPS.<br>
+  <a href="https://atum246.github.io/ramup/">🌐 Website</a> · <a href="#-commands">Commands</a> · <a href="#-vps-provider-guides">VPS Guides</a>
 </p>
 
 ---
@@ -58,12 +59,213 @@ ramup status
 
 ---
 
+## ☁️ VPS Provider Guides
+
+RAMUP works on any Linux VPS. Here are step-by-step guides for popular providers:
+
+### 🔵 DigitalOcean Droplets
+
+```bash
+# SSH into your droplet
+ssh root@your-droplet-ip
+
+# Install RAMUP
+curl -sL ramup.io/install | bash
+
+# Verify
+ramup status
+```
+
+**Tips for DigitalOcean:**
+- Works on all droplet sizes (including the $4/mo 512MB)
+- DigitalOcean droplets use SSD — swap performance is excellent
+- Recommended: Use the "Regular" CPU option for best ZRAM compression
+
+### 🟠 Vultr VPS
+
+```bash
+# SSH into your instance
+ssh root@your-vultr-ip
+
+# Install RAMUP
+curl -sL ramup.io/install | bash
+
+# Verify
+ramup status
+```
+
+**Tips for Vultr:**
+- Vultr uses NVMe SSDs on all plans — swap is fast
+- Works great on the $2.50/mo 512MB instance
+- High Frequency instances get even better ZRAM performance
+
+### 🟢 Linode / Akamai
+
+```bash
+# SSH into your Linode
+ssh root@your-linode-ip
+
+# Install RAMUP
+curl -sL ramup.io/install | bash
+
+# Verify
+ramup status
+```
+
+**Tips for Linode:**
+- Linode uses NVMe on newer plans
+- The 1GB Nanode ($5/mo) goes from 1GB → ~4.2GB effective
+- Enable the "Backup" service for extra safety
+
+### 🔴 Hetzner Cloud
+
+```bash
+# SSH into your server
+ssh root@your-hetzner-ip
+
+# Install RAMUP
+curl -sL ramup.io/install | bash
+
+# Verify
+ramup status
+```
+
+**Tips for Hetzner:**
+- Hetzner's CX11 (2GB) becomes ~7GB effective — incredible value
+- All plans use NVMe/SSD storage
+- Hetzner's ARM (CAX) plans work perfectly too
+
+### 🟣 AWS EC2
+
+```bash
+# SSH into your instance
+ssh -i your-key.pem ec2-user@your-instance-ip
+
+# Install RAMUP (requires sudo)
+sudo bash -c "$(curl -sL ramup.io/install)"
+
+# Verify
+ramup status
+```
+
+**Tips for AWS:**
+- Works on t2/t3/t4g micro instances (1GB → ~4.2GB)
+- `t4g` (ARM/Graviton) instances work perfectly
+- EBS-backed instances have moderate swap speed — use `gp3` volumes
+- Consider enabling [EBS optimization](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html)
+
+### 🟡 Google Cloud (GCP)
+
+```bash
+# SSH via gcloud
+gcloud compute ssh your-instance-name
+
+# Install RAMUP
+curl -sL ramup.io/install | bash
+
+# Verify
+ramup status
+```
+
+**Tips for GCP:**
+- Works on `e2-micro` and `e2-small` instances
+- GCP's `e2-micro` (1GB shared) benefits massively from ZRAM
+- Use SSD persistent disks for better swap performance
+
+### ⚪ Oracle Cloud Free Tier
+
+```bash
+# SSH into your instance
+ssh -i your-key opc@your-instance-ip
+
+# Install RAMUP
+curl -sL ramup.io/install | bash
+
+# Verify
+ramup status
+```
+
+**Tips for Oracle Cloud:**
+- The Always Free ARM instance (4 cores, 24GB RAM) is overkill — but RAMUP still optimizes it
+- The AMD free tier (1GB RAM) benefits the most: 1GB → ~4.2GB effective
+- Oracle uses block storage — swap speed depends on volume performance
+
+### 🟤 Contabo VPS
+
+```bash
+# SSH into your VPS
+ssh root@your-contabo-ip
+
+# Install RAMUP
+curl -sL ramup.io/install | bash
+
+# Verify
+ramup status
+```
+
+**Tips for Contabo:**
+- Contabo is known for offering lots of RAM for cheap — RAMUP makes it even better
+- Their VPS S (4GB) becomes ~11GB effective
+- Contabo uses SSD storage on most plans
+
+### 💜 Alibaba Cloud (ECS)
+
+```bash
+# SSH into your instance
+ssh root@your-alibaba-ip
+
+# Install RAMUP
+curl -sL ramup.io/install | bash
+
+# Verify
+ramup status
+```
+
+**Tips for Alibaba Cloud:**
+- Works on all ECS instance types including `ecs.t6` (burstable)
+- The 1GB `ecs.t6-c1m1.large` goes from 1GB → ~4.2GB effective
+- Use Enhanced SSD for best swap performance
+
+### 🔷 Azure Virtual Machines
+
+```bash
+# SSH into your VM
+ssh azureuser@your-vm-ip
+
+# Install RAMUP (requires sudo)
+sudo bash -c "$(curl -sL ramup.io/install)"
+
+# Verify
+ramup status
+```
+
+**Tips for Azure:**
+- Works on B-series burstable instances (B1s 1GB → ~4.2GB)
+- Use Premium SSD for swap — Standard HDD is too slow
+- The free tier B1s (1GB) benefits the most
+
+### General VPS Tips
+
+| Provider | Min RAM | Best Plan for RAMUP | SSD Type |
+|----------|---------|---------------------|----------|
+| DigitalOcean | 512MB | $6/mo (1GB → 4.2GB) | SSD |
+| Vultr | 512MB | $2.50/mo (512MB → 2.7GB) | NVMe |
+| Hetzner | 2GB | €3.29/mo (2GB → 7GB) | NVMe |
+| AWS EC2 | 1GB | t4g.micro (1GB → 4.2GB) | EBS gp3 |
+| GCP | 1GB | e2-micro (1GB → 4.2GB) | SSD |
+| Oracle | 1GB | Free AMD (1GB → 4.2GB) | Block |
+| Contabo | 4GB | VPS S (4GB → 11GB) | SSD |
+| Alibaba | 1GB | t6 burstable (1GB → 4.2GB) | ESSD |
+| Azure | 1GB | B1s (1GB → 4.2GB) | Premium |
+
+---
+
 ## 🎯 How It Works
 
-RAMUP uses **four engines** working together to extend your memory:
+RAMUP uses **four engines** working together:
 
 ### 1. 🗜️ ZRAM Engine
-Creates a compressed block device **inside your RAM**. Data that doesn't fit in normal RAM gets compressed and stored in a special region — like having a secret pocket dimension in your memory.
+Creates a compressed block device **inside your RAM**. Data that doesn't fit in normal RAM gets compressed — like having a secret pocket dimension in your memory.
 
 ```
 Physical RAM: 4GB
@@ -117,7 +319,7 @@ RAMUP adapts to **ANY** RAM size. Here's what to expect:
 
 ---
 
-## 🛠️ Full Command Reference
+## 🛠️ Commands
 
 ### Core
 ```bash
@@ -178,15 +380,15 @@ ramup daemon-status    # Check if daemon is running
 ```
 
 ### Global Options
-```bash
---force                # Skip confirmations
---quiet                # Minimal output
---verbose              # Extra logging
---dry-run              # Show what would be done without doing it
---aggressive           # Maximum performance mode
---safe                 # Conservative mode
---json                 # JSON output (for scripting)
-```
+| Option | Description |
+|--------|-------------|
+| `--force` | Skip confirmations |
+| `--quiet` | Minimal output |
+| `--verbose` | Extra logging |
+| `--dry-run` | Show what would be done |
+| `--aggressive` | Maximum performance mode |
+| `--safe` | Conservative mode |
+| `--json` | JSON output for scripting |
 
 ---
 
@@ -196,23 +398,32 @@ ramup daemon-status    # Check if daemon is running
 |----------|---------|
 | **Distros** | Ubuntu, Debian, CentOS, RHEL, Fedora, Arch, Alpine |
 | **Kernels** | Linux 3.14+ (required for ZRAM) |
-| **Virtualization** | KVM, OpenVZ, VMware, Hyper-V, bare-metal |
-| **Storage** | SSD and HDD (SSD recommended for swap) |
-| **Architectures** | x86_64, ARM |
+| **Virtualization** | KVM, OpenVZ, VMware, Hyper-V, Xen, bare-metal |
+| **Storage** | SSD, NVMe, HDD (SSD/NVMe recommended for swap) |
+| **Architectures** | x86_64, ARM (aarch64) |
 | **RAM Range** | 256MB to 128GB+ |
 
 ---
 
-## 🛡️ Safety Design
+## 🛡️ Safety
 
-RAMUP is built to be **safe by default**:
+RAMUP is designed to be **safe by default**:
 
 1. **📸 Backup First** — Creates a full backup before making any changes
-2. **🧱 Proven Tech** — Uses standard Linux features (ZRAM, swap, sysctl), not experimental hacks
+2. **🧱 Proven Tech** — Uses standard Linux features (ZRAM, swap, sysctl)
 3. **⏪ One-Command Rollback** — `ramup off` or `ramup restore` undoes everything
 4. **🛡️ Safe OOM Handling** — Never kills your apps unexpectedly
 5. **📝 Full Logging** — Every action is logged for debugging
 6. **🔄 Upgrade-Safe** — Detects existing installations and upgrades cleanly
+
+---
+
+## ⚠️ Important Notes
+
+- **"Effective" RAM ≠ "Real" RAM** — ZRAM performs close to real RAM (compressed in-memory), but swap on disk is significantly slower
+- **Swap on HDD is slow** — If your VPS uses spinning disks, swap will be a bottleneck for high-I/O workloads
+- **Overcommit risks** — `vm.overcommit_memory=1` allows memory overcommit. The OOM killer may activate if you actually run out
+- **Not a replacement for real RAM** — RAMUP helps survive memory spikes, but sustained memory pressure on a tiny VPS will always hit limits
 
 ---
 
@@ -238,8 +449,6 @@ Contributions are welcome! Here's how:
 4. **Push** to the branch (`git push origin feature/awesome-thing`)
 5. **Open** a Pull Request
 
-Please read the contributing guidelines before submitting.
-
 ---
 
 ## 📄 License
@@ -252,5 +461,5 @@ MIT License — see [LICENSE](LICENSE) for details.
   <strong>🟢 RAMUP</strong> — More RAM. Zero Cost. No Bullshit.
   <br>
   <br>
-  <a href="https://github.com/Atum246/ramup">GitHub</a> · <a href="https://github.com/Atum246/ramup/issues">Issues</a> · <a href="https://github.com/Atum246/ramup/releases">Releases</a>
+  <a href="https://atum246.github.io/ramup/">Website</a> · <a href="https://github.com/Atum246/ramup">GitHub</a> · <a href="https://github.com/Atum246/ramup/issues">Issues</a> · <a href="https://github.com/Atum246/ramup/releases">Releases</a>
 </p>
