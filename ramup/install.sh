@@ -22,6 +22,9 @@ NC='\033[0m'
 RAMUP_DIR="/opt/ramup"
 RAMUP_VERSION="2.0.0"
 
+# Ensure sbin paths are available
+export PATH="/usr/sbin:/sbin:${PATH}"
+
 # ─── Logo ─────────────────────────────────────────────────────────────────────
 echo -e "${GREEN}${BOLD}"
 cat << 'LOGO'

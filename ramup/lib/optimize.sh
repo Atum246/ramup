@@ -3,6 +3,24 @@
 # ramup/lib/optimize.sh — Deep Memory Optimization
 # ═══════════════════════════════════════════════════════════════════════════════
 
+# ─── Optimize tmpfs ───────────────────────────────────────
+optimize_tmpfs() {
+    # Clear unnecessary tmpfs mounts
+    for mount_point in /tmp /run /dev/shm; do
+        local usage
+        usage=$(df -m "$mount_point" 2>/dev/null | awk 'NR==2 {print $3}' || echo "0")
+        if [[ "$usage" -gt 100 ]]; then
+            log DEBUG "tmpfs ${mount_point} using ${usage}MB — consider cleaning"
+        fi
+    done
+}
+
+# ─── Clear Kernel Caches ─────────────────────────────────
+clear_kernel_caches() {
+    sync
+    echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+}
+
 # ─── Deep Optimization ────────────────────────────────────────────────────────
 deep_optimize() {
     require_root "optimize"
@@ -132,11 +150,13 @@ auto_fix() {
     fi
     
     # Fix 4: Check memory pressure
-    local used_pct
+    local used_pct=0
     local total_mb available_mb
     total_mb=$(get_total_ram_mb)
     available_mb=$(get_available_ram_mb)
-    used_pct=$(( (total_mb - available_mb) * 100 / total_mb ))
+    if [[ "$total_mb" -gt 0 ]]; then
+        used_pct=$(( (total_mb - available_mb) * 100 / total_mb ))
+    fi
     
     if [[ "$used_pct" -gt 85 ]]; then
         echo -e "  ${DIM}├─${NC} High memory pressure detected (${used_pct}%) — dropping caches..."

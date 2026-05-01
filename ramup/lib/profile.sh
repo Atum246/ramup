@@ -18,6 +18,8 @@ profile_memory() {
 }
 
 profile_all_memory() {
+    detect_system
+    
     local total_mb available_mb used_mb
     total_mb=$(get_total_ram_mb)
     available_mb=$(get_available_ram_mb)
@@ -27,7 +29,9 @@ profile_all_memory() {
     echo -e "  ${DIM}├─${NC} Total: $(human_readable $total_mb)"
     echo -e "  ${DIM}├─${NC} Used: $(human_readable $used_mb)"
     echo -e "  ${DIM}├─${NC} Available: $(human_readable $available_mb)"
-    echo -e "  ${DIM}└─${NC} Usage: $((used_mb * 100 / total_mb))%"
+    local pct=0
+    [[ "$total_mb" -gt 0 ]] && pct=$((used_mb * 100 / total_mb))
+    echo -e "  ${DIM}└─${NC} Usage: ${pct}%"
     echo ""
     
     echo -e "  ${WHITE}${BOLD}Memory Breakdown:${NC}"

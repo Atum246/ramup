@@ -28,7 +28,14 @@ setup_zram() {
     log INFO "ZRAM config: ${ZRAM_SIZE_MB}MB, algorithm: ${ZRAM_ALGORITHM}"
     
     # Load zram module
-    modprobe zram 2>/dev/null || true
+    if ! [[ -b /dev/zram0 ]]; then
+        modprobe zram 2>/dev/null || {
+            log WARN "Cannot load ZRAM kernel module"
+            log INFO "Attempting alternative ZRAM setup..."
+            setup_zram_alternative
+            return $?
+        }
+    fi
     
     # Wait for device
     local retries=10
@@ -38,8 +45,9 @@ setup_zram() {
     done
     
     if [[ ! -b "$ZRAM_DEVICE" ]]; then
-        log ERROR "ZRAM device not available. Kernel may not support ZRAM."
-        return 1
+        log WARN "ZRAM device not available, trying alternative..."
+        setup_zram_alternative
+        return $?
     fi
     
     # Set compression algorithm
@@ -81,6 +89,32 @@ setup_zram() {
     save_zram_config
     
     log INFO "ZRAM engine active: ${ZRAM_SIZE_MB}MB (${ZRAM_ALGORITHM}) ✅"
+}
+
+# ─── Alternative ZRAM Setup ───────────────────────────────
+setup_zram_alternative() {
+    # Try using zramctl if available
+    if command -v zramctl &>/dev/null; then
+        log INFO "Using zramctl for ZRAM setup..."
+        zramctl --find --size "${ZRAM_SIZE_MB}M" --algorithm "$ZRAM_ALGORITHM" 2>/dev/null || {
+            log WARN "zramctl failed"
+        }
+        
+        local zram_dev
+        zram_dev=$(zramctl --output-all 2>/dev/null | tail -1 | awk '{print $1}')
+        if [[ -n "$zram_dev" ]]; then
+            mkswap "$zram_dev" >/dev/null 2>&1
+            swapon -p 100 "$zram_dev" 2>/dev/null
+            ZRAM_ACTIVE=1
+            save_zram_config
+            log INFO "ZRAM active via zramctl: ${ZRAM_SIZE_MB}MB ✅"
+            return 0
+        fi
+    fi
+    
+    log WARN "ZRAM not available on this system"
+    log INFO "Swap file will be used instead for memory extension"
+    return 0
 }
 
 # ─── Disable ZRAM ─────────────────────────────────────────

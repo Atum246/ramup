@@ -11,6 +11,13 @@ SWAP_ACTIVE=0
 setup_swap() {
     log INFO "Setting up smart swap..."
     
+    # Check if swapon/mkswap are available
+    if ! command -v swapon &>/dev/null || ! command -v mkswap &>/dev/null; then
+        log WARN "swapon/mkswap not available — swap setup skipped"
+        log INFO "Install kmod or util-linux package for swap support"
+        return 0
+    fi
+    
     # Remove old ramup swap if exists
     remove_swap
     
@@ -40,21 +47,17 @@ setup_swap() {
     log INFO "Creating ${SWAP_SIZE_MB}MB swap file..."
     
     # Create swap file
-    # Method 1: fallocate (fast, works on ext4/xfs)
     local fs_type
     fs_type=$(get_root_fs_type)
     
     case "$fs_type" in
         ext4|xfs|btrfs)
-            # Use fallocate for modern filesystems
             fallocate -l "${SWAP_SIZE_MB}M" "$SWAP_FILE" 2>/dev/null || {
-                # Fallback to dd if fallocate fails
                 log DEBUG "fallocate failed, using dd..."
                 dd if=/dev/zero of="$SWAP_FILE" bs=1M count="$SWAP_SIZE_MB" status=none 2>/dev/null
             }
             ;;
         *)
-            # Safe fallback
             dd if=/dev/zero of="$SWAP_FILE" bs=1M count="$SWAP_SIZE_MB" status=none 2>/dev/null
             ;;
     esac

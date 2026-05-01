@@ -1,0 +1,2 @@
+/dev/zram0      partition 256M   0B  100
+/swapfile.ramup file      256M   0B   10

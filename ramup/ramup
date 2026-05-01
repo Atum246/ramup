@@ -25,6 +25,9 @@ RAMUP_STATE="${RAMUP_DIR}/state.json"
 RAMUP_CONFIG="${RAMUP_DIR}/config.conf"
 RAMUP_CACHE="${RAMUP_DIR}/cache"
 
+# Ensure sbin paths are available (needed for modprobe, swapon, etc.)
+export PATH="/usr/sbin:/sbin:${PATH}"
+
 # ─── Colors ───────────────────────────────────────────────────────────────────
 RED='\033[0;31m'
 GREEN='\033[0;32m'

@@ -4,6 +4,9 @@
 # Works with ANY RAM size. Any distro. Any VPS.
 # ═══════════════════════════════════════════════════════════════════════════════
 
+# Ensure sbin paths are available
+export PATH="/usr/sbin:/sbin:${PATH}"
+
 # ─── System Detection ─────────────────────────────────────────────────────────
 TOTAL_RAM_MB=0
 CPU_CORES=0

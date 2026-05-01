@@ -3,6 +3,12 @@
 # ramup/lib/cleanup.sh — Memory Cleanup & Process Optimization
 # ═══════════════════════════════════════════════════════════
 
+# ─── Optimize System ──────────────────────────────────────
+optimize_system() {
+    cleanup_memory
+    optimize_services
+}
+
 # ─── Cleanup Memory ───────────────────────────────────────
 cleanup_memory() {
     log INFO "Cleaning up memory..."
