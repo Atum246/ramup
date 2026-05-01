@@ -12,125 +12,204 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --bg: #0a0a0a; --bg-card: #111; --bg-terminal: #0d0d0d;
-      --green: #00ff88; --green-dim: #00cc6a; --green-glow: rgba(0,255,136,0.15);
+      --green: #00ff88; --green-dim: #00cc6a; --green-glow: rgba(0,255,136,0.12);
       --white: #f0f0f0; --gray: #888; --gray-dim: #555; --border: #1a1a1a;
       --font-mono: 'JetBrains Mono','Fira Code',monospace;
       --font-sans: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
     }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
     body { background: var(--bg); color: var(--white); font-family: var(--font-sans); line-height: 1.6; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
-    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 16px 0; background: rgba(10,10,10,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
-    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
+    /* ── NAV ── */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 14px 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
     .nav-logo { font-family: var(--font-mono); font-weight: 700; font-size: 18px; color: var(--green); text-decoration: none; letter-spacing: 2px; }
-    .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a { color: var(--gray); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: var(--gray); text-decoration: none; font-size: 13px; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
     .nav-links a:hover { color: var(--white); }
     .nav-github { display: flex; align-items: center; gap: 6px; color: var(--white) !important; }
-    .nav-github svg { width: 18px; height: 18px; fill: currentColor; }
+    .nav-github svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
 
-    .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; }
-    .hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%); pointer-events: none; }
-    .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border: 1px solid var(--border); border-radius: 100px; font-size: 13px; color: var(--gray); margin-bottom: 32px; background: var(--bg-card); }
+    /* Mobile nav */
+    .nav-toggle { display: none; background: none; border: none; color: var(--white); cursor: pointer; padding: 8px; }
+    .nav-toggle svg { width: 24px; height: 24px; fill: currentColor; }
+
+    /* ── SECTIONS ── */
+    section { max-width: 1100px; margin: 0 auto; padding: 80px 20px; }
+    .section-label { font-family: var(--font-mono); font-size: 12px; color: var(--green); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; }
+    .section-title { font-size: clamp(26px, 5vw, 40px); font-weight: 700; letter-spacing: -1px; margin-bottom: 16px; line-height: 1.15; }
+    .section-desc { font-size: 15px; color: var(--gray); max-width: 600px; margin-bottom: 40px; line-height: 1.6; }
+
+    /* ── HERO ── */
+    .hero { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 100px 20px 60px; position: relative; }
+    .hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: min(600px, 90vw); height: 600px; background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%); pointer-events: none; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border: 1px solid var(--border); border-radius: 100px; font-size: 12px; color: var(--gray); margin-bottom: 28px; background: var(--bg-card); }
     .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-    .hero h1 { font-size: clamp(48px,8vw,88px); font-weight: 800; letter-spacing: -2px; line-height: 1; margin-bottom: 20px; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .hero h1 { font-size: clamp(52px, 12vw, 96px); font-weight: 800; letter-spacing: -3px; line-height: 1; margin-bottom: 16px; }
     .hero h1 span { color: var(--green); }
-    .hero-tagline { font-size: clamp(16px,2vw,20px); color: var(--gray); max-width: 560px; margin: 0 auto 40px; }
-    .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
-    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--green); color: #000; font-weight: 600; font-size: 15px; border-radius: 10px; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; }
+    .hero-tagline { font-size: clamp(15px, 2.5vw, 19px); color: var(--gray); max-width: 500px; margin: 0 auto 32px; line-height: 1.5; }
+    .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px; background: var(--green); color: #000; font-weight: 600; font-size: 14px; border-radius: 10px; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; }
     .btn-primary:hover { background: #00ffaa; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(0,255,136,0.25); }
-    .btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: transparent; color: var(--white); font-weight: 600; font-size: 15px; border-radius: 10px; text-decoration: none; border: 1px solid var(--border); transition: all 0.2s; }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px; background: transparent; color: var(--white); font-weight: 600; font-size: 14px; border-radius: 10px; text-decoration: none; border: 1px solid var(--border); transition: all 0.2s; }
     .btn-secondary:hover { border-color: var(--gray-dim); transform: translateY(-1px); }
     .btn-secondary svg { width: 18px; height: 18px; fill: currentColor; }
 
-    .terminal-wrap { max-width: 680px; width: 100%; margin: 0 auto; }
-    .terminal { background: var(--bg-terminal); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; text-align: left; font-family: var(--font-mono); font-size: 13px; line-height: 1.7; }
-    .terminal-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: #111; border-bottom: 1px solid var(--border); }
-    .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+    /* ── TERMINAL ── */
+    .terminal-wrap { max-width: 640px; width: 100%; margin: 0 auto; }
+    .terminal { background: var(--bg-terminal); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; text-align: left; font-family: var(--font-mono); font-size: clamp(10px, 1.6vw, 13px); line-height: 1.65; }
+    .terminal-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #111; border-bottom: 1px solid var(--border); }
+    .terminal-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
     .terminal-dot.r { background: #ff5f57; } .terminal-dot.y { background: #ffbd2e; } .terminal-dot.g { background: #28ca42; }
-    .terminal-title { margin-left: 8px; font-size: 12px; color: var(--gray-dim); }
-    .terminal-body { padding: 20px; min-height: 280px; }
+    .terminal-title { margin-left: 6px; font-size: 11px; color: var(--gray-dim); }
+    .terminal-body { padding: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .terminal-body .prompt { color: var(--green); }
     .terminal-body .cmd { color: var(--white); }
     .terminal-body .output { color: var(--gray); }
     .terminal-body .highlight { color: var(--green); font-weight: 600; }
     .terminal-body .bar { color: var(--green); }
     .terminal-body .dim { color: var(--gray-dim); }
-    .cursor { display: inline-block; width: 8px; height: 16px; background: var(--green); animation: blink 1s step-end infinite; vertical-align: text-bottom; margin-left: 2px; }
-    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+    .terminal-body .ascii { font-size: clamp(7px, 1.2vw, 11px); }
+    .cursor { display: inline-block; width: 7px; height: 14px; background: var(--green); animation: blink 1s step-end infinite; vertical-align: text-bottom; margin-left: 2px; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
-    .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; max-width: 700px; margin: 60px auto 0; background: var(--border); border-radius: 12px; overflow: hidden; }
-    .stat { background: var(--bg-card); padding: 28px 20px; text-align: center; }
-    .stat-num { font-family: var(--font-mono); font-size: 32px; font-weight: 700; color: var(--green); line-height: 1; }
-    .stat-label { font-size: 13px; color: var(--gray); margin-top: 8px; }
+    /* ── STATS ── */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; max-width: 660px; width: 100%; margin: 48px auto 0; background: var(--border); border-radius: 12px; overflow: hidden; }
+    .stat { background: var(--bg-card); padding: 22px 16px; text-align: center; }
+    .stat-num { font-family: var(--font-mono); font-size: clamp(24px, 4vw, 32px); font-weight: 700; color: var(--green); line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--gray); margin-top: 6px; }
 
-    section { max-width: 1100px; margin: 0 auto; padding: 100px 24px; }
-    .section-label { font-family: var(--font-mono); font-size: 13px; color: var(--green); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; }
-    .section-title { font-size: clamp(28px,4vw,40px); font-weight: 700; letter-spacing: -1px; margin-bottom: 16px; }
-    .section-desc { font-size: 16px; color: var(--gray); max-width: 600px; margin-bottom: 48px; }
-
-    .engines { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 16px; }
-    .engine { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; transition: border-color 0.3s; }
+    /* ── ENGINES ── */
+    .engines { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+    .engine { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; transition: border-color 0.3s; }
     .engine:hover { border-color: var(--gray-dim); }
-    .engine-icon { font-size: 28px; margin-bottom: 16px; }
-    .engine h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
-    .engine p { font-size: 14px; color: var(--gray); line-height: 1.6; }
-    .engine-stat { font-family: var(--font-mono); font-size: 13px; color: var(--green); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .engine-icon { font-size: 26px; margin-bottom: 14px; }
+    .engine h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    .engine p { font-size: 13px; color: var(--gray); line-height: 1.6; }
+    .engine-stat { font-family: var(--font-mono); font-size: 12px; color: var(--green); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
 
-    .table-wrap { overflow-x: auto; margin-top: 32px; }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th { font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); }
-    td { padding: 14px 16px; border-bottom: 1px solid #111; color: var(--gray); }
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 28px; border-radius: 12px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 500px; }
+    th { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); background: var(--bg-card); position: sticky; top: 0; }
+    td { padding: 12px 14px; border-bottom: 1px solid #111; color: var(--gray); }
     tr:hover td { background: rgba(0,255,136,0.03); }
     td:last-child { font-family: var(--font-mono); font-weight: 600; color: var(--green); }
 
-    .cmd-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 16px; }
-    .cmd-group { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
-    .cmd-group h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-    .cmd-group code { display: block; font-family: var(--font-mono); font-size: 13px; color: var(--gray); padding: 4px 0; }
-    .cmd-group code .name { color: var(--green); }
-    .cmd-group code .desc { color: var(--gray-dim); margin-left: 8px; }
-
-    .compat-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 12px; }
-    .compat-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; text-align: center; font-size: 14px; font-weight: 500; transition: border-color 0.3s; }
-    .compat-item:hover { border-color: var(--green); }
-    .compat-item .icon { font-size: 24px; margin-bottom: 8px; }
-
-    /* VPS Guides */
-    .vps-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 16px; }
-    .vps-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; transition: border-color 0.3s; }
+    /* ── VPS CARDS ── */
+    .vps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+    .vps-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; transition: border-color 0.3s; }
     .vps-card:hover { border-color: var(--green); }
-    .vps-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-    .vps-card .price { font-family: var(--font-mono); font-size: 13px; color: var(--green); margin-bottom: 12px; }
-    .vps-card .tip { font-size: 13px; color: var(--gray); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); line-height: 1.5; }
-    .vps-card code { display: block; background: #0a0a0a; border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; font-family: var(--font-mono); font-size: 12px; color: var(--gray); margin-top: 10px; white-space: pre-wrap; }
+    .vps-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .vps-card .vps-type { font-size: 11px; color: var(--gray-dim); font-weight: 400; margin-bottom: 8px; }
+    .vps-card .price { font-family: var(--font-mono); font-size: 12px; color: var(--green); margin-bottom: 10px; }
+    .vps-card .tip { font-size: 12px; color: var(--gray); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); line-height: 1.5; }
+    .vps-card code { display: block; background: #080808; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; font-family: var(--font-mono); font-size: 11px; color: var(--gray); margin-top: 8px; white-space: pre-wrap; word-break: break-all; line-height: 1.5; }
 
-    .install-box { background: var(--bg-terminal); border: 1px solid var(--border); border-radius: 12px; padding: 32px; text-align: center; margin-top: 48px; }
-    .install-box h3 { font-size: 20px; margin-bottom: 20px; }
-    .install-cmd { font-family: var(--font-mono); font-size: 16px; background: #0a0a0a; border: 1px solid var(--border); border-radius: 8px; padding: 16px 24px; color: var(--green); display: inline-block; margin-bottom: 20px; user-select: all; cursor: pointer; transition: border-color 0.2s; }
+    /* Filter tabs */
+    .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+    .filter-tab { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--gray); transition: all 0.2s; font-family: var(--font-sans); }
+    .filter-tab:hover { border-color: var(--gray-dim); color: var(--white); }
+    .filter-tab.active { background: var(--green); color: #000; border-color: var(--green); }
+
+    /* ── COMMANDS ── */
+    .cmd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .cmd-group { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .cmd-group h3 { font-size: 13px; font-weight: 600; margin-bottom: 14px; }
+    .cmd-group code { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--gray); padding: 3px 0; }
+    .cmd-group code .name { color: var(--green); }
+    .cmd-group code .desc { color: var(--gray-dim); }
+
+    /* ── COMPAT ── */
+    .compat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .compat-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 14px; text-align: center; font-size: 13px; font-weight: 500; transition: border-color 0.3s; }
+    .compat-item:hover { border-color: var(--green); }
+    .compat-item .icon { font-size: 22px; margin-bottom: 6px; }
+
+    /* ── INSTALL ── */
+    .install-box { background: var(--bg-terminal); border: 1px solid var(--border); border-radius: 12px; padding: 28px 20px; text-align: center; margin-top: 32px; }
+    .install-box h3 { font-size: 18px; margin-bottom: 16px; }
+    .install-cmd { font-family: var(--font-mono); font-size: clamp(12px, 2vw, 15px); background: #0a0a0a; border: 1px solid var(--border); border-radius: 8px; padding: 14px 20px; color: var(--green); display: inline-block; margin-bottom: 16px; user-select: all; cursor: pointer; transition: border-color 0.2s; word-break: break-all; max-width: 100%; }
     .install-cmd:hover { border-color: var(--green); }
-    .install-note { font-size: 13px; color: var(--gray-dim); }
+    .install-note { font-size: 12px; color: var(--gray-dim); }
 
-    footer { border-top: 1px solid var(--border); padding: 40px 24px; text-align: center; }
-    footer p { font-size: 13px; color: var(--gray-dim); }
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid var(--border); padding: 36px 20px; text-align: center; }
+    footer p { font-size: 12px; color: var(--gray-dim); line-height: 2; }
     footer a { color: var(--gray); text-decoration: none; transition: color 0.2s; }
     footer a:hover { color: var(--green); }
     .divider { max-width: 1100px; margin: 0 auto; border: none; border-top: 1px solid var(--border); }
-    .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s, transform 0.6s; }
+
+    /* ── ANIMATION ── */
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
     .fade-in.visible { opacity: 1; transform: translateY(0); }
-    @media (max-width: 640px) { .stats { grid-template-columns: repeat(2,1fr); } .nav-links { gap: 16px; } .nav-links a:not(.nav-github) { display: none; } .terminal-body { font-size: 11px; padding: 14px; } }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 12px 0; }
+      .nav-inner { padding: 0 16px; }
+      .nav-links {
+        display: none; position: fixed; top: 52px; left: 0; right: 0; bottom: 0;
+        background: rgba(10,10,10,0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        flex-direction: column; align-items: center; justify-content: center; gap: 24px; z-index: 99;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { font-size: 18px; }
+      .nav-toggle { display: block; }
+
+      section { padding: 60px 16px; }
+      .hero { padding: 80px 16px 50px; }
+      .hero-ctas { flex-direction: column; align-items: center; }
+      .btn-primary, .btn-secondary { width: 100%; max-width: 280px; justify-content: center; }
+
+      .stats { grid-template-columns: repeat(2, 1fr); max-width: 320px; }
+      .stat { padding: 18px 12px; }
+
+      .vps-grid { grid-template-columns: 1fr; }
+      .engines { grid-template-columns: 1fr; }
+      .cmd-grid { grid-template-columns: 1fr; }
+      .compat-grid { grid-template-columns: repeat(2, 1fr); }
+      .filter-tabs { gap: 6px; }
+      .filter-tab { padding: 6px 12px; font-size: 11px; }
+
+      .terminal { font-size: 10px; border-radius: 8px; }
+      .terminal-body { padding: 12px; }
+
+      .install-box { padding: 24px 16px; }
+      .install-cmd { font-size: 12px; padding: 12px 14px; }
+    }
+
+    @media (max-width: 380px) {
+      .hero h1 { letter-spacing: -2px; }
+      .stats { grid-template-columns: repeat(2, 1fr); max-width: 260px; }
+      .stat-num { font-size: 20px; }
+      .compat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .compat-item { padding: 14px 10px; font-size: 12px; }
+    }
+
+    /* Smooth scrollbar for tables/terminal */
+    .table-wrap::-webkit-scrollbar, .terminal-body::-webkit-scrollbar { height: 6px; }
+    .table-wrap::-webkit-scrollbar-track, .terminal-body::-webkit-scrollbar-track { background: transparent; }
+    .table-wrap::-webkit-scrollbar-thumb, .terminal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   </style>
 </head>
 <body>
+
+  <!-- NAV -->
   <nav>
     <div class="nav-inner">
       <a href="#" class="nav-logo">RAMUP</a>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+      </button>
       <div class="nav-links">
-        <a href="#how-it-works">How It Works</a>
-        <a href="#sizing">Sizing</a>
-        <a href="#vps-guides">VPS Guides</a>
-        <a href="#commands">Commands</a>
+        <a href="#how-it-works" onclick="closeNav()">How It Works</a>
+        <a href="#sizing" onclick="closeNav()">Sizing</a>
+        <a href="#vps-guides" onclick="closeNav()">VPS Guides</a>
+        <a href="#commands" onclick="closeNav()">Commands</a>
+        <a href="#compat" onclick="closeNav()">Compat</a>
         <a href="https://github.com/Atum246/ramup" class="nav-github" target="_blank">
           <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
           GitHub
@@ -139,8 +218,9 @@
     </div>
   </nav>
 
+  <!-- HERO -->
   <section class="hero">
-    <div class="hero-badge"><span class="dot"></span> v2.0.0 — Open Source · MIT License</div>
+    <div class="hero-badge"><span class="dot"></span> v2.0.0 · Open Source · MIT</div>
     <h1><span>RAM</span>UP</h1>
     <p class="hero-tagline">Advanced VPS Memory Extension Engine.<br>More RAM. Zero Cost. No Bullshit.</p>
     <div class="hero-ctas">
@@ -150,44 +230,37 @@
         View on GitHub
       </a>
     </div>
+
     <div class="terminal-wrap">
       <div class="terminal">
         <div class="terminal-header">
           <span class="terminal-dot r"></span><span class="terminal-dot y"></span><span class="terminal-dot g"></span>
-          <span class="terminal-title">bash — ramup</span>
+          <span class="terminal-title">bash</span>
         </div>
-        <div class="terminal-body" id="terminal-anim">
+        <div class="terminal-body">
           <div><span class="prompt">$</span> <span class="cmd">curl -sL ramup.io/install | bash</span></div><br>
-          <div><span class="dim">╔═══════════════════════════════════════════════════════╗</span></div>
-          <div><span class="dim">║</span>  <span class="highlight">██████╗  █████╗ ███╗   ███╗██╗   ██╗██████╗</span>  <span class="dim">║</span></div>
-          <div><span class="dim">║</span>  <span class="highlight">██╔══██╗██╔══██╗████╗ ████║██║   ██║██╔══██╗</span> <span class="dim">║</span></div>
-          <div><span class="dim">║</span>  <span class="highlight">██████╔╝███████║██╔████╔██║██║   ██║██████╔╝</span> <span class="dim">║</span></div>
-          <div><span class="dim">║</span>  <span class="highlight">██╔══██╗██╔══██║██║╚██╔╝██║██║   ██║██╔═══╝</span>  <span class="dim">║</span></div>
-          <div><span class="dim">║</span>  <span class="highlight">██║  ██║██║  ██║██║ ╚═╝ ██║╚██████╔╝██║</span>      <span class="dim">║</span></div>
-          <div><span class="dim">║</span>  <span class="highlight">╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝ ╚═════╝ ╚═╝</span>      <span class="dim">║</span></div>
-          <div><span class="dim">╚═══════════════════════════════════════════════════════╝</span></div><br>
-          <div><span class="output">[✓] System: Ubuntu 22.04 | Kernel: 6.8.0 | Arch: x86_64</span></div>
-          <div><span class="output">[✓] RAM: 3499MB (standard) | CPU: 2 cores</span></div><br>
-          <div><span class="output">[·] Configuring ZRAM engine...</span></div>
-          <div><span class="output">[·] Setting up smart swap...</span></div>
-          <div><span class="output">[·] Optimizing kernel parameters...</span></div>
-          <div><span class="output">[·] Enabling intelligent auto-adjust...</span></div><br>
-          <div><span class="dim">┌──────────────────────────────────────────────┐</span></div>
-          <div><span class="dim">│</span>  <span class="highlight">Physical RAM:</span>  <span class="output">3499 MB</span>  <span class="bar">[████████████████░░░░]</span> <span class="output">72%</span>  <span class="dim">│</span></div>
-          <div><span class="dim">│</span>  <span class="highlight">ZRAM Active:</span>   <span class="output">2624 MB</span>  <span class="dim">(2.5:1 compression)</span>  <span class="dim">│</span></div>
-          <div><span class="dim">│</span>  <span class="highlight">Swap File:</span>     <span class="output">3499 MB</span>                       <span class="dim">│</span></div>
-          <div><span class="dim">│</span>  <span class="dim">─────────────────────────────────────────</span>    <span class="dim">│</span></div>
-          <div><span class="dim">│</span>  <span class="highlight">Effective RAM:</span> <span class="highlight">~9622 MB</span>  🚀                  <span class="dim">│</span></div>
-          <div><span class="dim">│</span>  <span class="highlight">RAM Gained:</span>    <span class="highlight">+6123 MB</span>  📈                  <span class="dim">│</span></div>
-          <div><span class="dim">└──────────────────────────────────────────────┘</span></div><br>
+          <div class="ascii"><span class="dim">╔═══════════════════════════════════════════════╗</span></div>
+          <div class="ascii"><span class="dim">║</span> <span class="highlight">██████╗  █████╗ ███╗   ███╗██╗   ██╗██████╗</span> <span class="dim">║</span></div>
+          <div class="ascii"><span class="dim">║</span> <span class="highlight">██╔══██╗██╔══██╗████╗ ████║██║   ██║██╔══██╗</span><span class="dim">║</span></div>
+          <div class="ascii"><span class="dim">║</span> <span class="highlight">██████╔╝███████║██╔████╔██║██║   ██║██████╔╝</span><span class="dim">║</span></div>
+          <div class="ascii"><span class="dim">║</span> <span class="highlight">██╔══██╗██╔══██║██║╚██╔╝██║██║   ██║██╔═══╝</span> <span class="dim">║</span></div>
+          <div class="ascii"><span class="dim">║</span> <span class="highlight">██║  ██║██║  ██║██║ ╚═╝ ██║╚██████╔╝██║</span>     <span class="dim">║</span></div>
+          <div class="ascii"><span class="dim">║</span> <span class="highlight">╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝ ╚═════╝ ╚═╝</span>     <span class="dim">║</span></div>
+          <div class="ascii"><span class="dim">╚═══════════════════════════════════════════════╝</span></div><br>
+          <div><span class="output">[✓] Ubuntu 22.04 · 6.8.0 · x86_64 · 3499MB RAM</span></div><br>
+          <div><span class="output">[·] ZRAM → 2624MB · Swap → 3499MB · Kernel tuned</span></div><br>
+          <div><span class="dim">┌─────────────────────────────────────────┐</span></div>
+          <div><span class="dim">│</span> <span class="highlight">Effective:</span> <span class="highlight">~9622 MB</span> 🚀 <span class="bar">+6123 MB</span>    <span class="dim">│</span></div>
+          <div><span class="dim">└─────────────────────────────────────────┘</span></div><br>
           <div><span class="prompt">$</span> <span class="cursor"></span></div>
         </div>
       </div>
     </div>
+
     <div class="stats">
-      <div class="stat"><div class="stat-num">2.7x</div><div class="stat-label">RAM Multiplier</div></div>
+      <div class="stat"><div class="stat-num">2.7x</div><div class="stat-label">Multiplier</div></div>
       <div class="stat"><div class="stat-num">$0</div><div class="stat-label">Cost</div></div>
-      <div class="stat"><div class="stat-num">30s</div><div class="stat-label">Install Time</div></div>
+      <div class="stat"><div class="stat-num">30s</div><div class="stat-label">Install</div></div>
       <div class="stat"><div class="stat-num">30+</div><div class="stat-label">Commands</div></div>
     </div>
   </section>
@@ -198,12 +271,12 @@
   <section id="how-it-works" class="fade-in">
     <div class="section-label">How It Works</div>
     <h2 class="section-title">Four engines. One system.</h2>
-    <p class="section-desc">RAMUP combines proven Linux memory technologies into a single, intelligent system that adapts to your workload in real time.</p>
+    <p class="section-desc">Proven Linux memory technologies combined into a single, intelligent system that adapts in real time.</p>
     <div class="engines">
-      <div class="engine"><div class="engine-icon">🗜️</div><h3>ZRAM Engine</h3><p>Creates a compressed block device inside your RAM. Data gets compressed at ~2.5:1 ratio — like a secret pocket dimension in your memory.</p><div class="engine-stat">+50–75% effective memory</div></div>
-      <div class="engine"><div class="engine-icon">💾</div><h3>Smart Swap</h3><p>SSD-aware disk swap acts as overflow when RAM and ZRAM are full. Auto-detects SSD vs HDD for optimal performance.</p><div class="engine-stat">+100% (SSD-backed)</div></div>
-      <div class="engine"><div class="engine-icon">🔧</div><h3>Kernel Tuning</h3><p>Optimizes vm.swappiness, vfs_cache_pressure, overcommit_memory, and dirty ratios for your specific hardware.</p><div class="engine-stat">+10–20% efficiency</div></div>
-      <div class="engine"><div class="engine-icon">🤖</div><h3>Auto-Adjust Daemon</h3><p>Background systemd service monitors memory pressure in real-time and adjusts parameters dynamically — from relaxed to critical mode.</p><div class="engine-stat">Real-time adaptation</div></div>
+      <div class="engine"><div class="engine-icon">🗜️</div><h3>ZRAM Engine</h3><p>Compressed block device inside RAM. ~2.5:1 compression ratio — a secret pocket dimension in your memory.</p><div class="engine-stat">+50–75% effective memory</div></div>
+      <div class="engine"><div class="engine-icon">💾</div><h3>Smart Swap</h3><p>SSD-aware disk swap as overflow. Auto-detects SSD vs HDD. NVMe swap is fast enough for most workloads.</p><div class="engine-stat">+100% (SSD-backed)</div></div>
+      <div class="engine"><div class="engine-icon">🔧</div><h3>Kernel Tuning</h3><p>Optimizes swappiness, vfs_cache_pressure, overcommit, and dirty ratios for your specific workload.</p><div class="engine-stat">+10–20% efficiency</div></div>
+      <div class="engine"><div class="engine-icon">🤖</div><h3>Auto-Adjust</h3><p>Systemd daemon monitors memory pressure in real-time. Adjusts from relaxed → balanced → aggressive → critical.</p><div class="engine-stat">Real-time adaptation</div></div>
     </div>
   </section>
 
@@ -213,7 +286,7 @@
   <section id="sizing" class="fade-in">
     <div class="section-label">Smart Sizing</div>
     <h2 class="section-title">Any RAM size. Automatic.</h2>
-    <p class="section-desc">RAMUP detects your hardware and configures itself automatically. From 256MB micro instances to 128GB+ enterprise boxes.</p>
+    <p class="section-desc">Auto-detects hardware and configures itself. From 256MB micro instances to 128GB+ enterprise boxes.</p>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Your RAM</th><th>ZRAM</th><th>Swap</th><th>Effective</th></tr></thead>
@@ -235,82 +308,404 @@
 
   <!-- VPS GUIDES -->
   <section id="vps-guides" class="fade-in">
-    <div class="section-label">Cloud VPS Guides</div>
+    <div class="section-label">Cloud & VPS Guides</div>
     <h2 class="section-title">Install on any provider.</h2>
-    <p class="section-desc">Step-by-step guides for every major cloud VPS provider. SSH in, paste, done.</p>
+    <p class="section-desc">Step-by-step guides for every major cloud and VPS provider. SSH in, paste, done.</p>
 
-    <div class="vps-grid">
-      <div class="vps-card">
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-filter="all">All</button>
+      <button class="filter-tab" data-filter="vps">VPS / Cloud</button>
+      <button class="filter-tab" data-filter="paas">PaaS</button>
+      <button class="filter-tab" data-filter="free">Free Tier</button>
+    </div>
+
+    <div class="vps-grid" id="vps-grid">
+
+      <!-- VPS / CLOUD PROVIDERS -->
+      <div class="vps-card" data-tags="vps">
         <h3>🔵 DigitalOcean</h3>
+        <div class="vps-type">Cloud VPS · SSD</div>
         <div class="price">$4/mo droplet → ~4.2GB effective</div>
-        <code>ssh root@your-droplet-ip
+        <code>ssh root@your-ip
 curl -sL ramup.io/install | bash</code>
-        <div class="tip">All plans use SSD. The 1GB droplet benefits the most. Use "Regular" CPU for best ZRAM compression.</div>
+        <div class="tip">All plans use SSD. 1GB droplet benefits the most. "Regular" CPU for best ZRAM.</div>
       </div>
 
-      <div class="vps-card">
+      <div class="vps-card" data-tags="vps">
         <h3>🟠 Vultr</h3>
+        <div class="vps-type">Cloud VPS · NVMe</div>
         <div class="price">$2.50/mo → ~2.7GB effective</div>
-        <code>ssh root@your-vultr-ip
+        <code>ssh root@your-ip
 curl -sL ramup.io/install | bash</code>
-        <div class="tip">NVMe SSDs on all plans — swap is blazing fast. High Frequency instances get even better ZRAM performance.</div>
+        <div class="tip">NVMe on all plans — swap is blazing fast. High Frequency instances get even better ZRAM.</div>
       </div>
 
-      <div class="vps-card">
+      <div class="vps-card" data-tags="vps">
         <h3>🟢 Hetzner</h3>
+        <div class="vps-type">Cloud VPS · NVMe</div>
         <div class="price">€3.29/mo CX22 → ~7GB effective</div>
-        <code>ssh root@your-hetzner-ip
+        <code>ssh root@your-ip
 curl -sL ramup.io/install | bash</code>
-        <div class="tip">Incredible value. NVMe on all plans. ARM (CAX) plans work perfectly too.</div>
+        <div class="tip">Best value in Europe. NVMe on all plans. ARM (CAX) plans work perfectly too.</div>
       </div>
 
-      <div class="vps-card">
+      <div class="vps-card" data-tags="vps">
+        <h3>🟣 Linode / Akamai</h3>
+        <div class="vps-type">Cloud VPS · NVMe</div>
+        <div class="price">$5/mo Nanode → ~4.2GB effective</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">NVMe on newer plans. Enable Backups for extra safety. Great docs & support.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps">
         <h3>🔴 AWS EC2</h3>
-        <div class="price">t4g.micro (free tier eligible) → ~4.2GB</div>
-        <code>ssh -i key.pem ec2-user@ip
+        <div class="vps-type">Cloud · EBS</div>
+        <div class="price">t4g.micro (free eligible) → ~4.2GB</div>
+        <code>ssh -i key.pem ec2-user@your-ip
 sudo bash -c "$(curl -sL ramup.io/install)"</code>
-        <div class="tip">Works on t2/t3/t4g. ARM Graviton (t4g) works perfectly. Use gp3 EBS volumes for best swap speed.</div>
+        <div class="tip">t2/t3/t4g all work. ARM Graviton (t4g) is great. Use gp3 EBS for swap speed.</div>
       </div>
 
-      <div class="vps-card">
+      <div class="vps-card" data-tags="vps free">
         <h3>🟡 Google Cloud</h3>
-        <div class="price">e2-micro (free tier) → ~4.2GB effective</div>
-        <code>gcloud compute ssh instance-name
+        <div class="vps-type">Cloud · Persistent Disk</div>
+        <div class="price">e2-micro (free tier) → ~4.2GB</div>
+        <code>gcloud compute ssh instance
 curl -sL ramup.io/install | bash</code>
-        <div class="tip">e2-micro and e2-small benefit massively. Use SSD persistent disks for swap.</div>
+        <div class="tip">e2-micro free tier benefits massively. Use SSD persistent disks for swap.</div>
       </div>
 
-      <div class="vps-card">
-        <h3>🟣 Oracle Cloud</h3>
-        <div class="price">Always Free 24GB ARM — overkill!</div>
+      <div class="vps-card" data-tags="vps free">
+        <h3>🟤 Oracle Cloud</h3>
+        <div class="vps-type">Cloud · Block Volume</div>
+        <div class="price">Always Free 24GB ARM!</div>
         <code>ssh -i key opc@your-ip
 curl -sL ramup.io/install | bash</code>
-        <div class="tip">Always Free AMD (1GB) benefits the most: 1GB → ~4.2GB. ARM instance is 24GB already but RAMUP still optimizes.</div>
+        <div class="tip">Always Free: 4-core ARM (24GB) or 1-core AMD (1GB). AMD benefits most from RAMUP.</div>
       </div>
 
-      <div class="vps-card">
+      <div class="vps-card" data-tags="vps">
         <h3>🟤 Contabo</h3>
-        <div class="price">VPS S 4GB → ~11GB effective</div>
-        <code>ssh root@your-contabo-ip
+        <div class="vps-type">VPS · SSD</div>
+        <div class="price">€4.99/mo VPS S → ~11GB effective</div>
+        <code>ssh root@your-ip
 curl -sL ramup.io/install | bash</code>
-        <div class="tip">Known for cheap RAM-heavy plans. RAMUP makes them even better. SSD on most plans.</div>
+        <div class="tip">Known for cheap RAM-heavy plans. RAMUP makes them unbeatable value.</div>
       </div>
 
-      <div class="vps-card">
+      <div class="vps-card" data-tags="vps">
         <h3>💜 Alibaba Cloud</h3>
-        <div class="price">t6 burstable 1GB → ~4.2GB effective</div>
-        <code>ssh root@your-alibaba-ip
+        <div class="vps-type">ECS · ESSD</div>
+        <div class="price">t6 1GB → ~4.2GB effective</div>
+        <code>ssh root@your-ip
 curl -sL ramup.io/install | bash</code>
-        <div class="tip">Works on all ECS types including burstable t6. Use Enhanced SSD (ESSD) for best swap performance.</div>
+        <div class="tip">All ECS types work including burstable t6. Use Enhanced SSD (ESSD) for swap.</div>
       </div>
 
-      <div class="vps-card">
+      <div class="vps-card" data-tags="vps free">
         <h3>🔷 Azure</h3>
-        <div class="price">B1s free tier → ~4.2GB effective</div>
-        <code>ssh azureuser@your-vm-ip
+        <div class="vps-type">VM · Premium SSD</div>
+        <div class="price">B1s (free tier) → ~4.2GB effective</div>
+        <code>ssh azureuser@your-ip
 sudo bash -c "$(curl -sL ramup.io/install)"</code>
-        <div class="tip">B-series burstable instances benefit the most. Use Premium SSD — Standard HDD is too slow for swap.</div>
+        <div class="tip">B-series burstable benefits most. Use Premium SSD — Standard HDD is too slow.</div>
       </div>
+
+      <div class="vps-card" data-tags="vps">
+        <h3>🟦 Scaleway</h3>
+        <div class="vps-type">Cloud · NVMe</div>
+        <div class="price">€7.99/mo DEV1-S → ~11GB effective</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">French cloud. NVMe on all plans. DEV1-S (4GB) becomes ~11GB with RAMUP.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps">
+        <h3>⬛ UpCloud</h3>
+        <div class="vps-type">Cloud · MaxIOPS</div>
+        <div class="price">€7/mo 2GB → ~7GB effective</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">MaxIOPS storage is extremely fast — swap performance is excellent. Helsinki & global DCs.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps">
+        <h3>🟫 OVHcloud</h3>
+        <div class="vps-type">VPS · NVMe</div>
+        <div class="price">€3.50/mo → ~4.2GB effective</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">Huge provider in Europe. NVMe on recent plans. Anti-DDoS included free.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps">
+        <h3>🟨 Hostinger</h3>
+        <div class="vps-type">VPS · NVMe</div>
+        <div class="price">$5.99/mo 1GB → ~4.2GB effective</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">Budget-friendly. NVMe storage on all VPS plans. KVM virtualization.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps">
+        <h3>⬛ Kamatera</h3>
+        <div class="vps-type">Cloud · SSD</div>
+        <div class="price">$4/mo 1GB → ~4.2GB effective</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">13 global data centers. Flexible sizing. 30-day free trial available.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps">
+        <h3>⬛ CloudSigma</h3>
+        <div class="vps-type">Cloud · SSD</div>
+        <div class="price">~$10.50/mo 1GB → ~4.2GB</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">Custom CPU/RAM/SSD sizing. Pay-per-use billing. Swiss-based, global DCs.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps">
+        <h3>🟦 InMotion Hosting</h3>
+        <div class="vps-type">VPS · SSD</div>
+        <div class="price">VPS 4GB → ~11GB effective</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">Managed VPS with root access. SSD storage. US-based data centers.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps">
+        <h3>🟩 DreamHost</h3>
+        <div class="vps-type">VPS · SSD</div>
+        <div class="price">$10/mo 1GB → ~4.2GB effective</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">Managed VPS. SSD storage. Unlimited bandwidth. US data centers.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps">
+        <h3>🟪 A2 Hosting</h3>
+        <div class="vps-type">VPS · NVMe</div>
+        <div class="price">$6.99/mo 1GB → ~4.2GB</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">Turbo servers with NVMe. "Anytime" money-back guarantee. Global DCs.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps">
+        <h3>🟦 InterServer</h3>
+        <div class="vps-type">VPS · SSD</div>
+        <div class="price">$6/mo 1GB → ~4.2GB effective</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">Price lock guarantee — your rate never increases. SSD storage. US-based.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps">
+        <h3>🟢 RackNerd</h3>
+        <div class="vps-type">VPS · SSD</div>
+        <div class="price">$10.98/yr 1GB → ~4.2GB!</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">Insanely cheap yearly plans. SSD storage. Great for hobby projects.</div>
+      </div>
+
+      <!-- PAAS -->
+      <div class="vps-card" data-tags="paas">
+        <h3>⬛ Render</h3>
+        <div class="vps-type">PaaS · Managed</div>
+        <div class="price">Free tier → Standard instances</div>
+        <code># Render runs containers, not raw SSH.
+# Use ramup in a custom Docker image:
+
+FROM ubuntu:22.04
+RUN curl -sL ramup.io/install | bash
+COPY . /app
+CMD ["./start.sh"]</code>
+        <div class="tip">Render doesn't give SSH access. Build RAMUP into your Dockerfile for memory-optimized containers.</div>
+      </div>
+
+      <div class="vps-card" data-tags="paas">
+        <h3>🟣 Railway</h3>
+        <div class="vps-type">PaaS · Managed</div>
+        <div class="price">Usage-based billing</div>
+        <code># Railway runs containers via Nixpacks.
+# Use a custom Dockerfile with RAMUP:
+
+FROM ubuntu:22.04
+RUN curl -sL ramup.io/install | bash
+COPY . /app
+CMD ["./start.sh"]</code>
+        <div class="tip">Railway deploys containers. Include RAMUP in your Docker image for memory optimization.</div>
+      </div>
+
+      <div class="vps-card" data-tags="paas">
+        <h3>🟠 Fly.io</h3>
+        <div class="vps-type">PaaS · Edge</div>
+        <div class="price">Free allowance available</div>
+        <code># Fly uses Firecracker VMs.
+# Add RAMUP to your Dockerfile:
+
+FROM ubuntu:22.04
+RUN curl -sL ramup.io/install | bash
+COPY . /app
+CMD ["./start.sh"]</code>
+        <div class="tip">Fly.io runs lightweight VMs. Build RAMUP into your image for memory extension on edge deployments.</div>
+      </div>
+
+      <div class="vps-card" data-tags="paas">
+        <h3>⬛ Koyeb</h3>
+        <div class="vps-type">PaaS · Serverless</div>
+        <div class="price">Free tier available</div>
+        <code># Koyeb runs containers.
+# Include RAMUP in your build:
+
+FROM ubuntu:22.04
+RUN curl -sL ramup.io/install | bash
+COPY . /app
+CMD ["./start.sh"]</code>
+        <div class="tip">Koyeb deploys Docker containers. Embed RAMUP in your Dockerfile for memory optimization.</div>
+      </div>
+
+      <div class="vps-card" data-tags="paas">
+        <h3>🟢 Heroku</h3>
+        <div class="vps-type">PaaS · Managed</div>
+        <div class="price">Free tier removed · Eco $5/mo</div>
+        <code># Heroku uses dynos (containers).
+# Custom buildpack or Dockerfile:
+
+FROM ubuntu:22.04
+RUN curl -sL ramup.io/install | bash
+COPY . /app
+CMD ["./start.sh"]</code>
+        <div class="tip">Heroku dynos are containers. Use a custom Dockerfile with RAMUP for memory-constrained dynos.</div>
+      </div>
+
+      <div class="vps-card" data-tags="paas">
+        <h3>🔷 DigitalOcean App Platform</h3>
+        <div class="vps-type">PaaS · Managed</div>
+        <div class="price">Basic $5/mo</div>
+        <code># App Platform runs containers.
+# Build RAMUP into your image:
+
+FROM ubuntu:22.04
+RUN curl -sL ramup.io/install | bash
+COPY . /app
+CMD ["./start.sh"]</code>
+        <div class="tip">DO App Platform is PaaS. For full control, use regular DigitalOcean Droplets instead.</div>
+      </div>
+
+      <div class="vps-card" data-tags="paas">
+        <h3>🟣 Google Cloud Run</h3>
+        <div class="vps-type">PaaS · Serverless</div>
+        <div class="price">2M free requests/mo</div>
+        <code># Cloud Run runs containers.
+# Include RAMUP in your build:
+
+FROM ubuntu:22.04
+RUN curl -sL ramup.io/install | bash
+COPY . /app
+CMD ["./start.sh"]</code>
+        <div class="tip">Cloud Run is serverless containers. Memory is per-request — RAMUP helps with container-level memory.</div>
+      </div>
+
+      <div class="vps-card" data-tags="paas">
+        <h3>🟠 AWS App Runner</h3>
+        <div class="vps-type">PaaS · Managed</div>
+        <div class="price">Pay per use</div>
+        <code># App Runner uses containers.
+# Build RAMUP into your image:
+
+FROM ubuntu:22.04
+RUN curl -sL ramup.io/install | bash
+COPY . /app
+CMD ["./start.sh"]</code>
+        <div class="tip">App Runner auto-scales containers. Embed RAMUP for memory optimization on each instance.</div>
+      </div>
+
+      <div class="vps-card" data-tags="paas">
+        <h3>🟦 Azure Container Instances</h3>
+        <div class="vps-type">PaaS · Containers</div>
+        <div class="price">Pay per second</div>
+        <code># ACI runs containers.
+# Include RAMUP in your build:
+
+FROM ubuntu:22.04
+RUN curl -sL ramup.io/install | bash
+COPY . /app
+CMD ["./start.sh"]</code>
+        <div class="tip">ACI is serverless containers. RAMUP helps when your container needs more memory than allocated.</div>
+      </div>
+
+      <div class="vps-card" data-tags="paas">
+        <h3>⬛ Modal</h3>
+        <div class="vps-type">PaaS · Serverless GPU</div>
+        <div class="price">$30 free credit/mo</div>
+        <code># Modal runs serverless functions.
+# Use RAMUP in your container image:
+
+import modal
+app = modal.App("my-app")
+image = modal.Image.from_dockerfile("Dockerfile")</code>
+        <div class="tip">Modal is great for ML workloads. Include RAMUP in your Dockerfile for memory-heavy inference jobs.</div>
+      </div>
+
+      <!-- FREE TIER -->
+      <div class="vps-card" data-tags="vps free">
+        <h3>🟢 Oracle Always Free</h3>
+        <div class="vps-type">Free forever · ARM & AMD</div>
+        <div class="price">FREE — 4-core ARM, 24GB RAM</div>
+        <code>ssh -i key opc@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">Best free tier in cloud. 4 ARM cores + 24GB RAM, or 1 AMD core + 1GB. Both forever free.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps free">
+        <h3>🟡 AWS Free Tier</h3>
+        <div class="vps-type">Free 12 months · t2/t3.micro</div>
+        <div class="price">FREE — 1GB RAM for 12 months</div>
+        <code>ssh -i key ec2-user@your-ip
+sudo bash -c "$(curl -sL ramup.io/install)"</code>
+        <div class="tip">t2.micro or t3.micro free for 12 months. RAMUP takes 1GB → ~4.2GB effective.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps free">
+        <h3>🟡 GCP Free Tier</h3>
+        <div class="vps-type">Free forever · e2-micro</div>
+        <div class="price">FREE — 1 shared core, 1GB RAM</div>
+        <code>gcloud compute ssh instance
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">e2-micro is free forever (with limits). RAMUP makes the 1GB usable for real workloads.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps free">
+        <h3>🔷 Azure Free Tier</h3>
+        <div class="vps-type">Free 12 months · B1s</div>
+        <div class="price">FREE — 1GB RAM for 12 months</div>
+        <code>ssh azureuser@your-ip
+sudo bash -c "$(curl -sL ramup.io/install)"</code>
+        <div class="tip">B1s free for 12 months. Use Premium SSD for swap. RAMUP: 1GB → ~4.2GB.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps free">
+        <h3>🟠 Vultr Free Trial</h3>
+        <div class="vps-type">Free $250 credit · 30 days</div>
+        <div class="price">FREE — $250 credit to test</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">$250 free credit for 30 days. Enough to test RAMUP on multiple instance sizes.</div>
+      </div>
+
+      <div class="vps-card" data-tags="vps free">
+        <h3>🟢 Hetzner Free Trial</h3>
+        <div class="vps-type">Free €20 credit</div>
+        <div class="price">FREE — €20 credit to test</div>
+        <code>ssh root@your-ip
+curl -sL ramup.io/install | bash</code>
+        <div class="tip">€20 free credit on signup. CX22 (€3.29/mo) runs for ~6 months free with the credit.</div>
+      </div>
+
     </div>
   </section>
 
@@ -320,12 +715,12 @@ sudo bash -c "$(curl -sL ramup.io/install)"</code>
   <section id="commands" class="fade-in">
     <div class="section-label">Commands</div>
     <h2 class="section-title">Everything you need.</h2>
-    <p class="section-desc">30+ commands covering install, optimization, monitoring, Docker, health checks, backups, and more.</p>
+    <p class="section-desc">30+ commands for install, optimization, monitoring, Docker, health checks, and backups.</p>
     <div class="cmd-grid">
       <div class="cmd-group">
         <h3>⚡ Core</h3>
-        <code><span class="name">install</span> <span class="desc">— Install and activate</span></code>
-        <code><span class="name">uninstall</span> <span class="desc">— Remove and restore</span></code>
+        <code><span class="name">install</span> <span class="desc">— Install & activate</span></code>
+        <code><span class="name">uninstall</span> <span class="desc">— Remove & restore</span></code>
         <code><span class="name">status</span> <span class="desc">— Memory status card</span></code>
         <code><span class="name">monitor</span> <span class="desc">— Live dashboard</span></code>
         <code><span class="name">on / off</span> <span class="desc">— Enable / disable</span></code>
@@ -361,15 +756,15 @@ sudo bash -c "$(curl -sL ramup.io/install)"</code>
   <section id="compat" class="fade-in">
     <div class="section-label">Compatibility</div>
     <h2 class="section-title">Works everywhere.</h2>
-    <p class="section-desc">Any distro. Any virtualization. Any architecture. If it runs Linux, RAMUP runs on it.</p>
+    <p class="section-desc">Any distro. Any virtualization. Any architecture.</p>
     <div class="compat-grid">
       <div class="compat-item"><div class="icon">🐧</div>Ubuntu / Debian</div>
       <div class="compat-item"><div class="icon">🎩</div>CentOS / RHEL</div>
       <div class="compat-item"><div class="icon">🏹</div>Arch Linux</div>
       <div class="compat-item"><div class="icon">🏔️</div>Alpine Linux</div>
-      <div class="compat-item"><div class="icon">💿</div>SSD & HDD</div>
+      <div class="compat-item"><div class="icon">💿</div>SSD & NVMe</div>
       <div class="compat-item"><div class="icon">🖥️</div>KVM / VMware</div>
-      <div class="compat-item"><div class="icon">🔲</div>OpenVZ</div>
+      <div class="compat-item"><div class="icon">🔲</div>OpenVZ / Xen</div>
       <div class="compat-item"><div class="icon">⚙️</div>x86_64 & ARM</div>
     </div>
   </section>
@@ -383,12 +778,12 @@ sudo bash -c "$(curl -sL ramup.io/install)"</code>
     <p class="section-desc">Copy, paste, done. Your VPS memory is extended.</p>
     <div class="install-box">
       <h3>Install RAMUP</h3>
-      <div class="install-cmd" onclick="navigator.clipboard.writeText('curl -sL ramup.io/install | bash'); this.textContent='Copied! ✓'; setTimeout(()=>this.textContent='curl -sL ramup.io/install | bash', 2000)">curl -sL ramup.io/install | bash</div>
-      <p class="install-note">Requires root · Linux only · Kernel 3.14+</p>
+      <div class="install-cmd" onclick="copyCmd(this, 'curl -sL ramup.io/install | bash')">curl -sL ramup.io/install | bash</div>
+      <p class="install-note">Requires root · Linux · Kernel 3.14+</p>
     </div>
-    <div class="install-box" style="margin-top: 16px;">
+    <div class="install-box" style="margin-top: 14px;">
       <h3>Or clone from GitHub</h3>
-      <div class="install-cmd" onclick="navigator.clipboard.writeText('git clone https://github.com/Atum246/ramup.git && cd ramup/ramup && sudo bash install.sh'); this.textContent='Copied! ✓'; setTimeout(()=>this.textContent='git clone https://github.com/Atum246/ramup.git', 2000)">git clone https://github.com/Atum246/ramup.git</div>
+      <div class="install-cmd" onclick="copyCmd(this, 'git clone https://github.com/Atum246/ramup.git')">git clone https://github.com/Atum246/ramup.git</div>
       <p class="install-note">Then: cd ramup/ramup && sudo bash install.sh</p>
     </div>
   </section>
@@ -398,15 +793,50 @@ sudo bash -c "$(curl -sL ramup.io/install)"</code>
       <a href="https://github.com/Atum246/ramup">GitHub</a> ·
       <a href="https://github.com/Atum246/ramup/issues">Issues</a> ·
       <a href="https://github.com/Atum246/ramup/releases">Releases</a>
-      <br><br>MIT License · Built with ❤️
+      <br>MIT License · Built with ❤️
     </p>
   </footer>
 
   <script>
+    // Mobile nav
+    function closeNav() { document.querySelector('.nav-links').classList.remove('open'); }
+    document.addEventListener('click', function(e) {
+      const nav = document.querySelector('.nav-links');
+      const toggle = document.querySelector('.nav-toggle');
+      if (nav.classList.contains('open') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+        nav.classList.remove('open');
+      }
+    });
+
+    // Scroll animations
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.08 });
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Copy command
+    function copyCmd(el, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        el.textContent = 'Copied! ✓';
+        setTimeout(() => el.textContent = text, 2000);
+      });
+    }
+
+    // Filter tabs
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        const filter = this.dataset.filter;
+        document.querySelectorAll('.vps-card').forEach(card => {
+          if (filter === 'all' || card.dataset.tags.includes(filter)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
   </script>
 </body>
 </html>
