@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAMUP — More RAM. Zero Cost. No Bullshit.</title>
+  <meta name="description" content="Advanced VPS Memory Extension Engine for Linux. Works with ANY RAM size. Any distro. Any VPS.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-card: #111111;
+      --bg-terminal: #0d0d0d;
+      --green: #00ff88;
+      --green-dim: #00cc6a;
+      --green-glow: rgba(0, 255, 136, 0.15);
+      --white: #f0f0f0;
+      --gray: #888;
+      --gray-dim: #555;
+      --border: #1a1a1a;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--green);
+      text-decoration: none;
+      letter-spacing: 2px;
+    }
+
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+
+    .nav-links a {
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-github {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--white) !important;
+    }
+
+    .nav-github svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--gray);
+      margin-bottom: 32px;
+      background: var(--bg-card);
+    }
+
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero h1 {
+      font-size: clamp(48px, 8vw, 88px);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span { color: var(--green); }
+
+    .hero-tagline {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--gray);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      font-weight: 400;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--green);
+      color: #000;
+      font-weight: 600;
+      font-size: 15px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background: #00ffaa;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 30px rgba(0, 255, 136, 0.25);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: transparent;
+      color: var(--white);
+      font-weight: 600;
+      font-size: 15px;
+      border-radius: 10px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--gray-dim);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* ── TERMINAL ── */
+    .terminal-wrap {
+      max-width: 680px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .terminal {
+      background: var(--bg-terminal);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #111;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.r { background: #ff5f57; }
+    .terminal-dot.y { background: #ffbd2e; }
+    .terminal-dot.g { background: #28ca42; }
+
+    .terminal-title {
+      margin-left: 8px;
+      font-size: 12px;
+      color: var(--gray-dim);
+    }
+
+    .terminal-body {
+      padding: 20px;
+      min-height: 280px;
+    }
+
+    .terminal-body .prompt { color: var(--green); }
+    .terminal-body .cmd { color: var(--white); }
+    .terminal-body .comment { color: var(--gray-dim); }
+    .terminal-body .output { color: var(--gray); }
+    .terminal-body .highlight { color: var(--green); font-weight: 600; }
+    .terminal-body .warn { color: #ffbd2e; }
+    .terminal-body .bar { color: var(--green); }
+    .terminal-body .dim { color: var(--gray-dim); }
+
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 16px;
+      background: var(--green);
+      animation: blink 1s step-end infinite;
+      vertical-align: text-bottom;
+      margin-left: 2px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ── STATS ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      max-width: 700px;
+      margin: 60px auto 0;
+      background: var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .stat {
+      background: var(--bg-card);
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: var(--font-mono);
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--green);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--gray);
+      margin-top: 8px;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 100px 24px;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      font-size: 16px;
+      color: var(--gray);
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .engines {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .engine {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      transition: border-color 0.3s;
+    }
+
+    .engine:hover { border-color: var(--gray-dim); }
+
+    .engine-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .engine h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .engine p {
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+
+    .engine-stat {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--green);
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── SIZING TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 32px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gray);
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #111;
+      color: var(--gray);
+    }
+
+    tr:hover td { background: rgba(0, 255, 136, 0.03); }
+
+    td:last-child {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--green);
+    }
+
+    /* ── COMMANDS ── */
+    .cmd-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .cmd-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .cmd-group h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cmd-group code {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--gray);
+      padding: 4px 0;
+    }
+
+    .cmd-group code .name { color: var(--green); }
+    .cmd-group code .desc { color: var(--gray-dim); margin-left: 8px; }
+
+    /* ── COMPAT ── */
+    .compat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .compat-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      transition: border-color 0.3s;
+    }
+
+    .compat-item:hover { border-color: var(--green); }
+
+    .compat-item .icon { font-size: 24px; margin-bottom: 8px; }
+
+    /* ── INSTALL SECTION ── */
+    .install-box {
+      background: var(--bg-terminal);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      margin-top: 48px;
+    }
+
+    .install-box h3 {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .install-cmd {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      background: #0a0a0a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 24px;
+      color: var(--green);
+      display: inline-block;
+      margin-bottom: 20px;
+      user-select: all;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .install-cmd:hover { border-color: var(--green); }
+
+    .install-note {
+      font-size: 13px;
+      color: var(--gray-dim);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: var(--gray-dim);
+    }
+
+    footer a {
+      color: var(--gray);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover { color: var(--green); }
+
+    /* ── DIVIDER ── */
+    .divider {
+      max-width: 1100px;
+      margin: 0 auto;
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { gap: 16px; }
+      .nav-links a:not(.nav-github) { display: none; }
+      .terminal-body { font-size: 11px; padding: 14px; }
+    }
+
+    /* ── ANIMATIONS ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s, transform 0.6s;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">RAMUP</a>
+      <div class="nav-links">
+        <a href="#how-it-works">How It Works</a>
+        <a href="#sizing">Sizing</a>
+        <a href="#commands">Commands</a>
+        <a href="#compat">Compatibility</a>
+        <a href="https://github.com/Atum246/ramup" class="nav-github" target="_blank">
+          <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      v2.0.0 — Open Source · MIT License
+    </div>
+
+    <h1><span>RAM</span>UP</h1>
+
+    <p class="hero-tagline">
+      Advanced VPS Memory Extension Engine.<br>
+      More RAM. Zero Cost. No Bullshit.
+    </p>
+
+    <div class="hero-ctas">
+      <a href="#install" class="btn-primary">
+        Install Now →
+      </a>
+      <a href="https://github.com/Atum246/ramup" class="btn-secondary" target="_blank">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+
+    <div class="terminal-wrap">
+      <div class="terminal">
+        <div class="terminal-header">
+          <span class="terminal-dot r"></span>
+          <span class="terminal-dot y"></span>
+          <span class="terminal-dot g"></span>
+          <span class="terminal-title">bash — ramup</span>
+        </div>
+        <div class="terminal-body" id="terminal-anim">
+          <div><span class="prompt">$</span> <span class="cmd">curl -sL ramup.io/install | bash</span></div>
+          <br>
+          <div><span class="dim">╔═══════════════════════════════════════════════════════╗</span></div>
+          <div><span class="dim">║</span>  <span class="highlight">██████╗  █████╗ ███╗   ███╗██╗   ██╗██████╗</span>  <span class="dim">║</span></div>
+          <div><span class="dim">║</span>  <span class="highlight">██╔══██╗██╔══██╗████╗ ████║██║   ██║██╔══██╗</span> <span class="dim">║</span></div>
+          <div><span class="dim">║</span>  <span class="highlight">██████╔╝███████║██╔████╔██║██║   ██║██████╔╝</span> <span class="dim">║</span></div>
+          <div><span class="dim">║</span>  <span class="highlight">██╔══██╗██╔══██║██║╚██╔╝██║██║   ██║██╔═══╝</span>  <span class="dim">║</span></div>
+          <div><span class="dim">║</span>  <span class="highlight">██║  ██║██║  ██║██║ ╚═╝ ██║╚██████╔╝██║</span>      <span class="dim">║</span></div>
+          <div><span class="dim">║</span>  <span class="highlight">╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝ ╚═════╝ ╚═╝</span>      <span class="dim">║</span></div>
+          <div><span class="dim">╚═══════════════════════════════════════════════════════╝</span></div>
+          <br>
+          <div><span class="output">[✓] System: Ubuntu 22.04 | Kernel: 6.8.0 | Arch: x86_64</span></div>
+          <div><span class="output">[✓] RAM: 3499MB (standard) | CPU: 2 cores</span></div>
+          <br>
+          <div><span class="output">[·] Configuring ZRAM engine...</span></div>
+          <div><span class="output">[·] Setting up smart swap...</span></div>
+          <div><span class="output">[·] Optimizing kernel parameters...</span></div>
+          <div><span class="output">[·] Enabling intelligent auto-adjust...</span></div>
+          <br>
+          <div><span class="dim">┌──────────────────────────────────────────────┐</span></div>
+          <div><span class="dim">│</span>  <span class="highlight">Physical RAM:</span>  <span class="output">3499 MB</span>  <span class="bar">[████████████████░░░░]</span> <span class="output">72%</span>  <span class="dim">│</span></div>
+          <div><span class="dim">│</span>  <span class="highlight">ZRAM Active:</span>   <span class="output">2624 MB</span>  <span class="dim">(2.5:1 compression)</span>  <span class="dim">│</span></div>
+          <div><span class="dim">│</span>  <span class="highlight">Swap File:</span>     <span class="output">3499 MB</span>                       <span class="dim">│</span></div>
+          <div><span class="dim">│</span>  <span class="dim">─────────────────────────────────────────</span>    <span class="dim">│</span></div>
+          <div><span class="dim">│</span>  <span class="highlight">Effective RAM:</span> <span class="highlight">~9622 MB</span>  🚀                  <span class="dim">│</span></div>
+          <div><span class="dim">│</span>  <span class="highlight">RAM Gained:</span>    <span class="highlight">+6123 MB</span>  📈                  <span class="dim">│</span></div>
+          <div><span class="dim">└──────────────────────────────────────────────┘</span></div>
+          <br>
+          <div><span class="prompt">$</span> <span class="cursor"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">2.7x</div>
+        <div class="stat-label">RAM Multiplier</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">$0</div>
+        <div class="stat-label">Cost</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">30s</div>
+        <div class="stat-label">Install Time</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">30+</div>
+        <div class="stat-label">Commands</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works" class="fade-in">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">Four engines. One system.</h2>
+    <p class="section-desc">
+      RAMUP combines proven Linux memory technologies into a single,
+      intelligent system that adapts to your workload in real time.
+    </p>
+
+    <div class="engines">
+      <div class="engine">
+        <div class="engine-icon">🗜️</div>
+        <h3>ZRAM Engine</h3>
+        <p>Creates a compressed block device inside your RAM. Data gets compressed at ~2.5:1 ratio — like a secret pocket dimension in your memory.</p>
+        <div class="engine-stat">+50–75% effective memory</div>
+      </div>
+      <div class="engine">
+        <div class="engine-icon">💾</div>
+        <h3>Smart Swap</h3>
+        <p>SSD-aware disk swap acts as overflow when RAM and ZRAM are full. Auto-detects SSD vs HDD for optimal performance.</p>
+        <div class="engine-stat">+100% (SSD-backed)</div>
+      </div>
+      <div class="engine">
+        <div class="engine-icon">🔧</div>
+        <h3>Kernel Tuning</h3>
+        <p>Optimizes vm.swappiness, vfs_cache_pressure, overcommit_memory, and dirty ratios for your specific hardware.</p>
+        <div class="engine-stat">+10–20% efficiency</div>
+      </div>
+      <div class="engine">
+        <div class="engine-icon">🤖</div>
+        <h3>Auto-Adjust Daemon</h3>
+        <p>Background systemd service monitors memory pressure in real-time and adjusts parameters dynamically — from relaxed to critical mode.</p>
+        <div class="engine-stat">Real-time adaptation</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SIZING -->
+  <section id="sizing" class="fade-in">
+    <div class="section-label">Smart Sizing</div>
+    <h2 class="section-title">Any RAM size. Automatic.</h2>
+    <p class="section-desc">
+      RAMUP detects your hardware and configures itself automatically.
+      From 256MB micro instances to 128GB+ enterprise boxes.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Your RAM</th>
+            <th>ZRAM</th>
+            <th>Swap</th>
+            <th>Effective</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>512 MB</td><td>768 MB</td><td>1.5 GB</td><td>~2.7 GB</td></tr>
+          <tr><td>1 GB</td><td>1.25 GB</td><td>2 GB</td><td>~4.2 GB</td></tr>
+          <tr><td>2 GB</td><td>2 GB</td><td>3 GB</td><td>~7 GB</td></tr>
+          <tr><td>4 GB</td><td>3 GB</td><td>4 GB</td><td>~11 GB</td></tr>
+          <tr><td>8 GB</td><td>4 GB</td><td>6 GB</td><td>~18 GB</td></tr>
+          <tr><td>16 GB</td><td>5.6 GB</td><td>8 GB</td><td>~30 GB</td></tr>
+          <tr><td>32 GB</td><td>8 GB</td><td>11 GB</td><td>~51 GB</td></tr>
+          <tr><td>64 GB</td><td>9.6 GB</td><td>16 GB</td><td>~90 GB</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- COMMANDS -->
+  <section id="commands" class="fade-in">
+    <div class="section-label">Commands</div>
+    <h2 class="section-title">Everything you need.</h2>
+    <p class="section-desc">
+      30+ commands covering install, optimization, monitoring,
+      Docker, health checks, backups, and more.
+    </p>
+
+    <div class="cmd-grid">
+      <div class="cmd-group">
+        <h3>⚡ Core</h3>
+        <code><span class="name">install</span> <span class="desc">— Install and activate</span></code>
+        <code><span class="name">uninstall</span> <span class="desc">— Remove and restore</span></code>
+        <code><span class="name">status</span> <span class="desc">— Memory status card</span></code>
+        <code><span class="name">monitor</span> <span class="desc">— Live dashboard</span></code>
+        <code><span class="name">on / off</span> <span class="desc">— Enable / disable</span></code>
+      </div>
+      <div class="cmd-group">
+        <h3>🧠 Intelligence</h3>
+        <code><span class="name">analyze</span> <span class="desc">— Memory analysis</span></code>
+        <code><span class="name">predict</span> <span class="desc">— Exhaustion forecast</span></code>
+        <code><span class="name">watch</span> <span class="desc">— Leak detection</span></code>
+        <code><span class="name">top</span> <span class="desc">— Interactive viewer</span></code>
+        <code><span class="name">tune</span> <span class="desc">— Auto-tune workload</span></code>
+      </div>
+      <div class="cmd-group">
+        <h3>🐳 Docker</h3>
+        <code><span class="name">docker-opt</span> <span class="desc">— Optimize memory</span></code>
+        <code><span class="name">docker-limit</span> <span class="desc">— Container limits</span></code>
+        <code><span class="name">docker-stats</span> <span class="desc">— Memory statistics</span></code>
+      </div>
+      <div class="cmd-group">
+        <h3>🛡️ Safety</h3>
+        <code><span class="name">backup</span> <span class="desc">— Create backup</span></code>
+        <code><span class="name">restore</span> <span class="desc">— Restore backup</span></code>
+        <code><span class="name">rollback</span> <span class="desc">— Undo changes</span></code>
+        <code><span class="name">health</span> <span class="desc">— 8-point check</span></code>
+        <code><span class="name">logs</span> <span class="desc">— Activity logs</span></code>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- COMPATIBILITY -->
+  <section id="compat" class="fade-in">
+    <div class="section-label">Compatibility</div>
+    <h2 class="section-title">Works everywhere.</h2>
+    <p class="section-desc">
+      Any distro. Any virtualization. Any architecture. If it runs Linux, RAMUP runs on it.
+    </p>
+
+    <div class="compat-grid">
+      <div class="compat-item">
+        <div class="icon">🐧</div>
+        Ubuntu / Debian
+      </div>
+      <div class="compat-item">
+        <div class="icon">🎩</div>
+        CentOS / RHEL
+      </div>
+      <div class="compat-item">
+        <div class="icon">🏹</div>
+        Arch Linux
+      </div>
+      <div class="compat-item">
+        <div class="icon">🏔️</div>
+        Alpine Linux
+      </div>
+      <div class="compat-item">
+        <div class="icon">💿</div>
+        SSD & HDD
+      </div>
+      <div class="compat-item">
+        <div class="icon">🖥️</div>
+        KVM / VMware
+      </div>
+      <div class="compat-item">
+        <div class="icon">🔲</div>
+        OpenVZ
+      </div>
+      <div class="compat-item">
+        <div class="icon">⚙️</div>
+        x86_64 & ARM
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- INSTALL -->
+  <section id="install" class="fade-in">
+    <div class="section-label">Get Started</div>
+    <h2 class="section-title">One command. Thirty seconds.</h2>
+    <p class="section-desc">
+      Copy, paste, done. Your VPS memory is extended.
+    </p>
+
+    <div class="install-box">
+      <h3>Install RAMUP</h3>
+      <div class="install-cmd" onclick="navigator.clipboard.writeText('curl -sL ramup.io/install | bash'); this.textContent='Copied! ✓'; setTimeout(()=>this.textContent='curl -sL ramup.io/install | bash', 2000)">
+        curl -sL ramup.io/install | bash
+      </div>
+      <p class="install-note">Requires root · Linux only · Kernel 3.14+</p>
+    </div>
+
+    <div class="install-box" style="margin-top: 16px;">
+      <h3>Or clone from GitHub</h3>
+      <div class="install-cmd" onclick="navigator.clipboard.writeText('git clone https://github.com/Atum246/ramup.git && cd ramup/ramup && sudo bash install.sh'); this.textContent='Copied! ✓'; setTimeout(()=>this.textContent='git clone https://github.com/Atum246/ramup.git', 2000)">
+        git clone https://github.com/Atum246/ramup.git
+      </div>
+      <p class="install-note">Then: cd ramup/ramup && sudo bash install.sh</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>
+      <a href="https://github.com/Atum246/ramup">GitHub</a> ·
+      <a href="https://github.com/Atum246/ramup/issues">Issues</a> ·
+      <a href="https://github.com/Atum246/ramup/releases">Releases</a>
+      <br><br>
+      MIT License · Built with ❤️
+    </p>
+  </footer>
+
+  <!-- SCROLL ANIMATIONS -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
