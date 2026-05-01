@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMUP — More RAM. Zero Cost. No Bullshit.</title>
+    <meta name="description" content="Advanced VPS Memory Extension Engine. Works with ANY RAM size. Any distro. Any VPS.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a0a;
+            --bg-card: #111111;
+            --bg-terminal: #0d0d0d;
+            --green: #00ff88;
+            --green-dim: #00cc6a;
+            --green-glow: rgba(0, 255, 136, 0.15);
+            --white: #ffffff;
+            --gray: #888888;
+            --gray-dim: #444444;
+            --border: #1a1a1a;
+            --text: #e0e0e0;
+            --text-dim: #666666;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ─── Noise Texture ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* ─── Glow Effect ─── */
+        .glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-1 {
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.5;
+        }
+
+        .glow-2 {
+            bottom: -200px;
+            right: -200px;
+            opacity: 0.3;
+        }
+
+        /* ─── Navigation ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 10, 0.8);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--green);
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--white);
+        }
+
+        .nav-github {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--white) !important;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .nav-github:hover {
+            border-color: var(--green) !important;
+        }
+
+        /* ─── Hero ─── */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 120px 40px 80px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 32px;
+            background: var(--bg-card);
+        }
+
+        .hero-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .hero h1 {
+            font-size: clamp(48px, 8vw, 96px);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -3px;
+            margin-bottom: 24px;
+            background: linear-gradient(180deg, var(--white) 0%, var(--gray) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero h1 .green {
+            background: linear-gradient(180deg, var(--green) 0%, var(--green-dim) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: clamp(16px, 2vw, 20px);
+            color: var(--gray);
+            max-width: 560px;
+            margin-bottom: 48px;
+            line-height: 1.7;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: var(--green);
+            color: var(--bg);
+            font-weight: 700;
+            font-size: 15px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: transparent;
+            color: var(--white);
+            font-weight: 600;
+            font-size: 15px;
+            border-radius: 12px;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--gray);
+            transform: translateY(-2px);
+        }
+
+        /* ─── Terminal ─── */
+        .terminal-container {
+            position: relative;
+            width: 100%;
+            max-width: 720px;
+            margin: 64px auto 0;
+        }
+
+        .terminal {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f57; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #28c840; }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .terminal-body {
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            min-height: 200px;
+        }
+
+        .terminal-line {
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .terminal-line .prompt {
+            color: var(--green);
+        }
+
+        .terminal-line .cmd {
+            color: var(--white);
+        }
+
+        .terminal-line .comment {
+            color: var(--text-dim);
+        }
+
+        .terminal-line .output {
+            color: var(--gray);
+        }
+
+        .terminal-line .highlight {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .terminal-line:nth-child(1) { animation-delay: 0.1s; }
+        .terminal-line:nth-child(2) { animation-delay: 0.4s; }
+        .terminal-line:nth-child(3) { animation-delay: 0.7s; }
+        .terminal-line:nth-child(4) { animation-delay: 1.0s; }
+        .terminal-line:nth-child(5) { animation-delay: 1.3s; }
+        .terminal-line:nth-child(6) { animation-delay: 1.6s; }
+        .terminal-line:nth-child(7) { animation-delay: 1.9s; }
+        .terminal-line:nth-child(8) { animation-delay: 2.2s; }
+        .terminal-line:nth-child(9) { animation-delay: 2.5s; }
+        .terminal-line:nth-child(10) { animation-delay: 2.8s; }
+
+        /* ─── Stats ─── */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 80px auto 0;
+        }
+
+        .stat {
+            background: var(--bg-card);
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--green);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ─── Section ─── */
+        section {
+            position: relative;
+            padding: 120px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--green);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .section-desc {
+            font-size: 18px;
+            color: var(--gray);
+            max-width: 560px;
+            line-height: 1.7;
+            margin-bottom: 64px;
+        }
+
+        /* ─── Features Grid ─── */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .feature {
+            background: var(--bg-card);
+            padding: 40px 32px;
+            transition: background 0.2s;
+        }
+
+        .feature:hover {
+            background: #161616;
+        }
+
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .feature h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .feature p {
+            font-size: 14px;
+            color: var(--gray);
+            line-height: 1.7;
+        }
+
+        /* ─── How It Works ─── */
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .how-step {
+            position: relative;
+            padding: 32px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--bg-card);
+        }
+
+        .how-step-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--border);
+            margin-bottom: 16px;
+        }
+
+        .how-step h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .how-step p {
+            font-size: 14px;
+            color: var(--gray);
+            line-height: 1.7;
+        }
+
+        /* ─── Compatibility ─── */
+        .compat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .compat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .compat-item .check {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        /* ─── Commands Table ─── */
+        .commands-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .commands-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .commands-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .commands-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .commands-table code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--green);
+            background: rgba(0, 255, 136, 0.08);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        /* ─── CTA ─── */
+        .cta {
+            text-align: center;
+            padding: 120px 40px;
+            position: relative;
+        }
+
+        .cta h2 {
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 900;
+            letter-spacing: -3px;
+            margin-bottom: 24px;
+            line-height: 1.1;
+        }
+
+        .cta p {
+            font-size: 18px;
+            color: var(--gray);
+            margin-bottom: 40px;
+        }
+
+        .install-box {
+            display: inline-block;
+            padding: 16px 32px;
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            color: var(--green);
+            margin-bottom: 32px;
+        }
+
+        /* ─── Footer ─── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        footer a {
+            color: var(--gray);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--green);
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+            nav {
+                padding: 16px 20px;
+            }
+
+            .nav-links {
+                gap: 16px;
+            }
+
+            .hero {
+                padding: 100px 20px 60px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .how-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            section {
+                padding: 80px 20px;
+            }
+
+            .terminal-body {
+                font-size: 12px;
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links a:not(.nav-github) {
+                display: none;
+            }
+
+            .hero h1 {
+                letter-spacing: -2px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .compat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-dim);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray);
+        }
+
+        /* ─── Selection ─── */
+        ::selection {
+            background: var(--green);
+            color: var(--bg);
+        }
+    </style>
+</head>
+<body>
+    <!-- Glow Effects -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="nav-logo">RAMUP</a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#how">How It Works</a>
+            <a href="#commands">Commands</a>
+            <a href="https://github.com/Atum246/ramup" class="nav-github" target="_blank">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                GitHub
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            v2.0.0 — Now with Docker support
+        </div>
+        <h1><span class="green">More RAM.</span><br>Zero Cost.</h1>
+        <p class="hero-sub">
+            Advanced VPS Memory Extension Engine. Turns your cheap VPS into a powerhouse. Works with any RAM size, any distro, any VPS.
+        </p>
+        <div class="hero-buttons">
+            <a href="#install" class="btn-primary">
+                Get Started →
+            </a>
+            <a href="https://github.com/Atum246/ramup" class="btn-secondary" target="_blank">
+                View on GitHub
+            </a>
+        </div>
+
+        <!-- Terminal -->
+        <div class="terminal-container">
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <span class="terminal-title">terminal — bash</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line"><span class="prompt">$ </span><span class="cmd">curl -sL ramup.io/install | bash</span></div>
+                    <div class="terminal-line"><span class="output">&nbsp;</span></div>
+                    <div class="terminal-line"><span class="comment">&nbsp;&nbsp;╔═══════════════════════════════════════╗</span></div>
+                    <div class="terminal-line"><span class="comment">&nbsp;&nbsp;║&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;🟢 R A M U P&nbsp;&nbsp;v2.0.0 🟢&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;║</span></div>
+                    <div class="terminal-line"><span class="comment">&nbsp;&nbsp;╚═══════════════════════════════════════╝</span></div>
+                    <div class="terminal-line"><span class="output">&nbsp;</span></div>
+                    <div class="terminal-line"><span class="output">&nbsp;&nbsp;[✓] ZRAM engine active: <span class="highlight">2624MB</span></span></div>
+                    <div class="terminal-line"><span class="output">&nbsp;&nbsp;[✓] Smart swap active: <span class="highlight">3500MB</span></span></div>
+                    <div class="terminal-line"><span class="output">&nbsp;&nbsp;[✓] Kernel optimized</span></div>
+                    <div class="terminal-line"><span class="output">&nbsp;</span></div>
+                    <div class="terminal-line"><span class="output">&nbsp;&nbsp;Physical RAM: <span class="highlight">3499MB</span> → Effective: <span class="highlight">~9623MB</span> 🚀</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">2x</div>
+                <div class="stat-label">More RAM</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">$0</div>
+                <div class="stat-label">Cost</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">30s</div>
+                <div class="stat-label">Install</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">30+</div>
+                <div class="stat-label">Commands</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features">
+        <div class="section-label">Features</div>
+        <h2 class="section-title">Everything you need.<br>Nothing you don't.</h2>
+        <p class="section-desc">
+            No bloat. No buzzwords. Just proven technology that makes your VPS better.
+        </p>
+
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">🗜️</div>
+                <h3>ZRAM Engine</h3>
+                <p>Compressed RAM in memory. Auto-selects the best algorithm (zstd, lz4, lzo) based on your CPU. 50-75% effective RAM expansion.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💾</div>
+                <h3>Smart Swap</h3>
+                <p>Auto-sized swap file with SSD detection. Scales from 256MB to 32GB based on your RAM. Emergency overflow protection.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚙️</div>
+                <h3>Kernel Tuning</h3>
+                <p>Optimized swappiness, cache pressure, dirty pages, and overcommit. Tuned for your specific workload automatically.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔄</div>
+                <h3>Auto-Adjust</h3>
+                <p>Real-time daemon that monitors memory pressure and adjusts parameters dynamically. Responds to load spikes instantly.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🐳</div>
+                <h3>Docker Support</h3>
+                <p>Container memory optimization, default limits, log rotation, and cleanup. Docker-aware memory management.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <h3>Memory Profiling</h3>
+                <p>Per-process memory analysis, leak detection, and exhaustion prediction. Know exactly where your RAM goes.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🛡️</div>
+                <h3>Safety Net</h3>
+                <p>Pre-install backups, one-command rollback, and health checks. Never break your VPS. Always recoverable.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📺</div>
+                <h3>Live Dashboard</h3>
+                <p>Real-time terminal UI showing RAM, ZRAM, swap, compression ratios, and top processes. Beautiful and informative.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3>Instant Boost</h3>
+                <p>Emergency memory recovery. Drops caches, compacts memory, and optimizes in one command. When you need RAM now.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how">
+        <div class="section-label">How It Works</div>
+        <h2 class="section-title">Three steps. Thirty seconds.</h2>
+        <p class="section-desc">
+            No configuration files. No manual tuning. No PhD required.
+        </p>
+
+        <div class="how-grid">
+            <div class="how-step">
+                <div class="how-step-number">01</div>
+                <h3>Detect</h3>
+                <p>RAMUP scans your system — RAM, CPU, storage, kernel, distro. Knows exactly what you're working with.</p>
+            </div>
+            <div class="how-step">
+                <div class="how-step-number">02</div>
+                <h3>Optimize</h3>
+                <p>Enables ZRAM, creates swap, tunes kernel, cleans up services. All calculated for your specific hardware.</p>
+            </div>
+            <div class="how-step">
+                <div class="how-step-number">03</div>
+                <h3>Monitor</h3>
+                <p>Auto-adjust daemon watches your system 24/7. Responds to pressure changes. Keeps everything running smooth.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compatibility -->
+    <section>
+        <div class="section-label">Compatibility</div>
+        <h2 class="section-title">Works everywhere.</h2>
+        <p class="section-desc">
+            Any RAM size. Any distro. Any VPS provider. Any kernel.
+        </p>
+
+        <div class="compat-grid">
+            <div class="compat-item"><span class="check">✓</span> Ubuntu / Debian</div>
+            <div class="compat-item"><span class="check">✓</span> CentOS / RHEL</div>
+            <div class="compat-item"><span class="check">✓</span> Fedora</div>
+            <div class="compat-item"><span class="check">✓</span> Arch Linux</div>
+            <div class="compat-item"><span class="check">✓</span> Alpine Linux</div>
+            <div class="compat-item"><span class="check">✓</span> KVM / OpenVZ</div>
+            <div class="compat-item"><span class="check">✓</span> VMware / Hyper-V</div>
+            <div class="compat-item"><span class="check">✓</span> Physical Servers</div>
+            <div class="compat-item"><span class="check">✓</span> 256MB — 128GB+ RAM</div>
+            <div class="compat-item"><span class="check">✓</span> SSD & HDD</div>
+            <div class="compat-item"><span class="check">✓</span> Kernel 3.14+</div>
+            <div class="compat-item"><span class="check">✓</span> x86_64 & ARM</div>
+        </div>
+    </section>
+
+    <!-- Commands -->
+    <section id="commands">
+        <div class="section-label">Commands</div>
+        <h2 class="section-title">30+ commands.<br>Simple interface.</h2>
+        <p class="section-desc">
+            One tool. Consistent interface. Everything you need.
+        </p>
+
+        <table class="commands-table">
+            <thead>
+                <tr>
+                    <th>Command</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>ramup install</code></td><td>One-click install and activate</td></tr>
+                <tr><td><code>ramup status</code></td><td>Memory status card with bars</td></tr>
+                <tr><td><code>ramup monitor</code></td><td>Live real-time dashboard</td></tr>
+                <tr><td><code>ramup boost</code></td><td>Instant memory boost</td></tr>
+                <tr><td><code>ramup tune</code></td><td>Auto-tune for your workload</td></tr>
+                <tr><td><code>ramup fix</code></td><td>Auto-fix memory issues</td></tr>
+                <tr><td><code>ramup analyze</code></td><td>Memory analysis & suggestions</td></tr>
+                <tr><td><code>ramup predict</code></td><td>Predict memory exhaustion</td></tr>
+                <tr><td><code>ramup profile</code></td><td>Per-process memory profiling</td></tr>
+                <tr><td><code>ramup watch</code></td><td>Watch for memory leaks</td></tr>
+                <tr><td><code>ramup health</code></td><td>8-point health check</td></tr>
+                <tr><td><code>ramup docker-opt</code></td><td>Optimize Docker memory</td></tr>
+                <tr><td><code>ramup off</code></td><td>Disable safely (rollback)</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Install -->
+    <section id="install" class="cta">
+        <h2>Ready for more RAM?</h2>
+        <p>One command. Thirty seconds. Zero cost.</p>
+        <div class="install-box">
+            $ curl -sL ramup.io/install | bash
+        </div>
+        <br>
+        <div class="hero-buttons">
+            <a href="https://github.com/Atum246/ramup" class="btn-primary" target="_blank">
+                Star on GitHub ⭐
+            </a>
+            <a href="https://github.com/Atum246/ramup/blob/master/README.md" class="btn-secondary" target="_blank">
+                Read the Docs
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            Built with 🟢 by <a href="https://github.com/Atum246" target="_blank">John</a>
+            &nbsp;·&nbsp;
+            <a href="https://github.com/Atum246/ramup" target="_blank">GitHub</a>
+            &nbsp;·&nbsp;
+            MIT License
+        </p>
+    </footer>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Terminal animation - restart on scroll into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const lines = entry.target.querySelectorAll('.terminal-line');
+                    lines.forEach(line => {
+                        line.style.animation = 'none';
+                        line.offsetHeight; // trigger reflow
+                        line.style.animation = '';
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        const terminal = document.querySelector('.terminal');
+        if (terminal) observer.observe(terminal);
+
+        // Glow follow mouse
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.querySelector('.glow-1');
+            if (glow) {
+                const x = e.clientX - 300;
+                const y = e.clientY - 300;
+                glow.style.transform = `translate(${x}px, ${y}px)`;
+            }
+        });
+    </script>
+</body>
+</html>
